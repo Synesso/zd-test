@@ -1,0 +1,23 @@
+[
+  {
+    "_id": 106,
+    "url": "http://initech.zendesk.com/api/v2/organizations/106.json",
+    "external_id": "2355f080-b37c-44f3-977e-53c341fde146",
+    "name": "Qualitern",
+    "domain_names": [
+      "gology.com",
+      "myopium.com",
+      "synkgen.com",
+      "bolax.com"
+    ],
+    "created_at": "2016-07-23T09:48:02 -10:00",
+    "details": "Artisân",
+    "shared_tickets": false,
+    "tags": [
+      "Nolan",
+      "Rivas",
+      "Morse",
+      "Conway"
+    ]
+  }
+]
