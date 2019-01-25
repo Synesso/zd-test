@@ -18,7 +18,7 @@ trait ArbitraryInput extends ScalaCheck {
     details <- Gen.identifier
     sharedTickets <- genBool
     tags <- Gen.listOf(Gen.identifier)
-  } yield Organisation(id, url, externalId, name, domainNames, createdAt, details, sharedTickets, tags)
+  } yield Organisation(id, createdAt, url, externalId, name, domainNames, details, sharedTickets, tags)
 
   implicit val arbOrg: Arbitrary[Organisation] = Arbitrary(genOrg)
 
