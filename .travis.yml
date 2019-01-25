@@ -3,6 +3,9 @@ language: scala
 scala:
   - 2.12.8
 
+env:
+  - SBT_OPTS="-Xmx4G"
+
 script:
   - sbt coverage test coverageReport
 
