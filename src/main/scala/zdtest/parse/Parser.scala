@@ -9,4 +9,6 @@ object Parser {
 
   def parseOrgs(f: File): Stream[Organisation] = read[Stream[Organisation]](f)
 
+  def orgMap(orgs: Seq[Organisation]): Map[Long, Organisation] = orgs.map(o => o._id -> o).toMap
+
 }
