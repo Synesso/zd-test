@@ -47,31 +47,8 @@ class ParserSpec extends Specification with ArbitraryInput {
         )
       }
     }
-
-    // Requires about 500MB of disk space.
-    "parse vast quantities of organisations" >> {
-      val f = mkTempFile
-      val json = write[Organisation](genOrg.sample.get)
-      val writer = new BufferedWriter(new FileWriter(f))
-      writer.write("[")
-      Stream.continually(json + ",").take(99999).foreach(writer.write)
-      writer.write(json)
-      writer.write("]")
-      writer.close()
-
-      val organisations = read[Stream[Organisation]](f)
-      organisations must haveSize(100000)
-    }
   }
-
-
 
   private def file(name: String): File = new File(s"src/test/resources/repo/$name.json")
-
-  private def mkTempFile: File = {
-    val f = Files.createTempFile("zdtest", "").toFile
-    f.deleteOnExit()
-    f
-  }
 
 }
