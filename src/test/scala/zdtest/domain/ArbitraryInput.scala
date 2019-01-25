@@ -38,11 +38,11 @@ trait ArbitraryInput extends ScalaCheck {
     email <- Gen.identifier
     phone <- Gen.identifier
     signature <- Gen.identifier
-    organization_id <- Gen.posNum[Long]
+    organization_id <- Gen.option(Gen.posNum[Long]).map(_.getOrElse(-1L))
     tags <- Gen.listOf(Gen.identifier)
     suspended <- genBool
     role <- Gen.identifier
-  } yield User(id, url, external_id, name, alias, created_at, active, verified, shared, locale, timezone, last_login_at,
+  } yield User(id, created_at, last_login_at, url, external_id, name, alias, active, verified, shared, locale, timezone,
     email, phone, signature, organization_id, tags, suspended, role)
 
   implicit val arbUser: Arbitrary[User] = Arbitrary(genUser)

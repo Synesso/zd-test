@@ -4,7 +4,7 @@ import java.io.File
 import java.time.{OffsetDateTime, ZoneOffset}
 
 import org.specs2.mutable.Specification
-import zdtest.domain.Organisation
+import zdtest.domain.{Organisation, User}
 
 class ParserSpec extends Specification {
 
@@ -42,6 +42,63 @@ class ParserSpec extends Specification {
           details = "MegaCorp",
           shared_tickets = false,
           tags = Seq("Vance", "Ray", "Jacobs", "Frank")
+        )
+      }
+    }
+  }
+
+  "parsing user files" should {
+    "parse an empty list" >> {
+      Parser.parseUsers(file("empty_list")) must beEmpty
+    }
+
+    "parse a single user" >> {
+      Parser.parseUsers(file("single_user")) mustEqual Seq(
+        User(
+          _id = 66,
+          created_at = OffsetDateTime.of(2016, 4, 11, 10, 8, 8, 0, ZoneOffset.ofHours(-10)),
+          last_login_at = OffsetDateTime.of(2014, 3, 18, 5, 42, 21, 0, ZoneOffset.ofHours(-11)),
+          url = "http://initech.zendesk.com/api/v2/users/66.json",
+          external_id = "e29c3611-d1f2-492e-a805-594e239ff922",
+          name = "Geneva Poole",
+          alias = "Mr Fernandez",
+          active = true,
+          verified = true,
+          shared = true,
+          locale = "en-AU",
+          timezone = "Aruba",
+          email = "fernandezpoole@flotonic.com",
+          phone = "8925-633-579",
+          signature = "Don't Worry Be Happy!",
+          organization_id = 114,
+          tags = Seq("Whitehaven", "Omar", "Waiohinu", "Catharine"),
+          suspended = true,
+          role = "admin")
+      )
+    }
+
+    "parse multiple users" >> {
+      Parser.parseUsers(file("many_users")) must beLike[Seq[User]] { case xs =>
+        xs.size mustEqual 75
+        xs.last mustEqual User(
+          _id = 75,
+          created_at = OffsetDateTime.of(2016, 6, 7, 9, 18, 0, 0, ZoneOffset.ofHours(-10)),
+          last_login_at = OffsetDateTime.of(2012, 10, 15, 12, 36, 41, 0, ZoneOffset.ofHours(-11)),
+          url = "http://initech.zendesk.com/api/v2/users/75.json",
+          external_id = "0db0c1da-8901-4dc3-a469-fe4b500d0fca",
+          name = "Catalina Simpson",
+          alias = "Miss Rosanna",
+          verified = true,
+          shared = true,
+          locale = "zh-CN",
+          timezone = "US Minor Outlying Islands",
+          email = "rosannasimpson@flotonic.com",
+          phone = "8615-883-099",
+          signature = "Don't Worry Be Happy!",
+          organization_id = 119,
+          tags = Seq("Veguita", "Navarre", "Elizaville", "Beaulieu"),
+          suspended = true,
+          role = "agent"
         )
       }
     }
