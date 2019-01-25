@@ -1,7 +1,7 @@
 package zdtest.parse
 
 import java.io.File
-import java.time.{ZoneId, ZonedDateTime}
+import java.time.{OffsetDateTime, ZoneOffset}
 
 import org.specs2.mutable.Specification
 import zdtest.domain.Organisation
@@ -21,7 +21,7 @@ class ParserSpec extends Specification {
           external_id = "2355f080-b37c-44f3-977e-53c341fde146",
           name = "Qualitern",
           domain_names = Seq("gology.com", "myopium.com", "synkgen.com", "bolax.com"),
-          created_at = ZonedDateTime.of(2016, 7, 23, 9, 48, 2, 0, ZoneId.of("-10:00")),
+          created_at = OffsetDateTime.of(2016, 7, 23, 9, 48, 2, 0, ZoneOffset.ofHours(-10)),
           details = "Artisân",
           shared_tickets = false,
           tags = Seq("Nolan", "Rivas", "Morse", "Conway")
@@ -38,7 +38,7 @@ class ParserSpec extends Specification {
           external_id = "42a1a845-70cf-40ed-a762-acb27fd606cc",
           name = "Strezzö",
           domain_names = Seq("techtrix.com", "teraprene.com", "corpulse.com", "flotonic.com"),
-          created_at = ZonedDateTime.of(2016, 2, 21, 6, 11, 51, 0, ZoneId.of("-11:00")),
+          created_at = OffsetDateTime.of(2016, 2, 21, 6, 11, 51, 0, ZoneOffset.ofHours(-11)),
           details = "MegaCorp",
           shared_tickets = false,
           tags = Seq("Vance", "Ray", "Jacobs", "Frank")

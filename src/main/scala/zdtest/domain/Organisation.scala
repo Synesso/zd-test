@@ -1,6 +1,6 @@
 package zdtest.domain
 
-import java.time.ZonedDateTime
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 case class Organisation(_id: Long,
@@ -8,7 +8,7 @@ case class Organisation(_id: Long,
                         external_id: String,
                         name: String,
                         domain_names: Seq[String],
-                        created_at: ZonedDateTime,
+                        created_at: OffsetDateTime,
                         details: String,
                         shared_tickets: Boolean,
                         tags: Seq[String])
@@ -16,11 +16,11 @@ case class Organisation(_id: Long,
 object Organisation {
   import upickle.default._
 
-  implicit val dateTimeRW: ReadWriter[ZonedDateTime] = {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss z")
-    readwriter[String].bimap[ZonedDateTime](
+  implicit val dateTimeRW: ReadWriter[OffsetDateTime] = {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss XXX")
+    readwriter[String].bimap[OffsetDateTime](
       formatter.format(_),
-      ZonedDateTime.parse(_, formatter)
+      OffsetDateTime.parse(_, formatter)
     )
   }
   implicit val rw: ReadWriter[Organisation] = macroRW[Organisation]
