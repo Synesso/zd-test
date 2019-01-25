@@ -1,28 +1,29 @@
 package zdtest.domain
 
-import upickle.default.{ReadWriter => RW, macroRW}
+import java.time.OffsetDateTime
 
-case class User(id: Int,
+import upickle.default.{macroRW, ReadWriter => RW}
+
+case class User(id: Long,
                 url: String,
                 externalId: String,
                 name: String,
                 alias: String,
-                createdAt: String,
+                createdAt: OffsetDateTime,
                 active: Boolean,
                 verified: Boolean,
                 shared: Boolean,
                 locale: String,
                 timezone: String,
-                lastLoginAt: String,
+                lastLoginAt: OffsetDateTime,
                 email: String,
                 phone: String,
                 signature: String,
-                organizationId: Int, // parse to organization - or fail
+                organizationId: Long,
                 tags: Seq[String],
                 suspended: Boolean,
-                role: String
-               )
+                role: String)
 
-object User {
+object User extends CommonRW {
   implicit val rw: RW[User] = macroRW
 }

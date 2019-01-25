@@ -13,17 +13,9 @@ case class Organisation(_id: Long,
                         shared_tickets: Boolean,
                         tags: Seq[String])
 
-object Organisation {
+object Organisation extends CommonRW {
   import upickle.default._
 
-  implicit val dateTimeRW: ReadWriter[OffsetDateTime] = {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss XXX")
-    readwriter[String].bimap[OffsetDateTime](
-      formatter.format(_),
-      OffsetDateTime.parse(_, formatter)
-    )
-  }
   implicit val rw: ReadWriter[Organisation] = macroRW[Organisation]
-
 }
 
