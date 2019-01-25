@@ -1,12 +1,14 @@
 package zdtest.parse
 
-import java.io.File
+import java.io.{BufferedWriter, File, FileWriter}
+import java.nio.file.Files
 import java.time.{OffsetDateTime, ZoneOffset}
 
 import org.specs2.mutable.Specification
-import zdtest.domain.Organisation
+import zdtest.domain.{ArbitraryInput, Organisation}
+import upickle.default._
 
-class ParserSpec extends Specification {
+class ParserSpec extends Specification with ArbitraryInput {
 
   "parsing organisation files" should {
     "parse an empty list" >> {
@@ -45,8 +47,31 @@ class ParserSpec extends Specification {
         )
       }
     }
+
+    // Requires about 500MB of disk space.
+    "parse vast quantities of organisations" >> {
+      val f = mkTempFile
+      val json = write[Organisation](genOrg.sample.get)
+      val writer = new BufferedWriter(new FileWriter(f))
+      writer.write("[")
+      Stream.continually(json + ",").take(99999).foreach(writer.write)
+      writer.write(json)
+      writer.write("]")
+      writer.close()
+
+      val organisations = read[Stream[Organisation]](f)
+      organisations must haveSize(100000)
+    }
   }
 
-  def file(name: String): File = new File(s"src/test/resources/parser/$name.json")
+
+
+  private def file(name: String): File = new File(s"src/test/resources/parser/$name.json")
+
+  private def mkTempFile: File = {
+    val f = Files.createTempFile("zdtest", "").toFile
+    f.deleteOnExit()
+    f
+  }
 
 }
