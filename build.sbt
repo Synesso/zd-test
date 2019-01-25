@@ -1,7 +1,7 @@
 lazy val root = (project in file("."))
   .configs(IntegrationTest)
   .settings(
-    name := "zendesk",
+    name := "zd-test",
     organization := "io.github.synesso",
     scalaVersion := "2.12.8",
     Defaults.itSettings,

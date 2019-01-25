@@ -1,14 +1,12 @@
 package zdtest.repo
 
-import java.io.{BufferedWriter, File, FileWriter}
-import java.nio.file.Files
+import java.io.File
 import java.time.{OffsetDateTime, ZoneOffset}
 
 import org.specs2.mutable.Specification
-import zdtest.domain.{ArbitraryInput, Organisation}
-import upickle.default._
+import zdtest.domain.Organisation
 
-class ParserSpec extends Specification with ArbitraryInput {
+class ParserSpec extends Specification {
 
   "parsing organisation files" should {
     "parse an empty list" >> {
