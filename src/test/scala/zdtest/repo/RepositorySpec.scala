@@ -1,6 +1,7 @@
-package zdtest.domain
+package zdtest.repo
 
 import org.specs2.mutable.Specification
+import zdtest.domain.{ArbitraryInput, Organisation}
 
 class RepositorySpec extends Specification with ArbitraryInput {
 

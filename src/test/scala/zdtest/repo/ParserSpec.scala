@@ -1,4 +1,4 @@
-package zdtest.parse
+package zdtest.repo
 
 import java.io.{BufferedWriter, File, FileWriter}
 import java.nio.file.Files
@@ -66,7 +66,7 @@ class ParserSpec extends Specification with ArbitraryInput {
 
 
 
-  private def file(name: String): File = new File(s"src/test/resources/parser/$name.json")
+  private def file(name: String): File = new File(s"src/test/resources/repo/$name.json")
 
   private def mkTempFile: File = {
     val f = Files.createTempFile("zdtest", "").toFile

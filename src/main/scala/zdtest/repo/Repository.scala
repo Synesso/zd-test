@@ -1,4 +1,6 @@
-package zdtest.domain
+package zdtest.repo
+
+import zdtest.domain.Organisation
 
 case class Repository(organisations: Map[Long, Organisation] = Map.empty) {
 
