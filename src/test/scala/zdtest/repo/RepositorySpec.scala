@@ -26,6 +26,11 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
       actual.values.toSeq.sortBy(_._id) mustEqual usersMappedToOrgs
       forall(usersMappedToOrgs) { u: User => actual.get(u._id) must beSome(u) }
     }.setGen1(Gen.nonEmptyListOf(genOrg)).set(minTestsOk = 10)
+
+    "fail to map when user is linked to non-existent organisation" >> prop { (u: User, o: Organisation) =>
+      val user = if (u.organization_id == o._id) u.copy(organization_id = u.organization_id + 1) else u
+      Repository(Seq(o), Seq(user)) must throwAn[IllegalArgumentException]
+    }.setGen1(genUser.suchThat(_.organization_id != -1))
   }
 
   "instantiating a repository from files" should {

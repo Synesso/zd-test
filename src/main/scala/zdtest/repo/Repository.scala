@@ -18,13 +18,12 @@ object Repository {
 
     val orgMap = orgList.map(o => o._id -> o).toMap
 
-    userList.find(u => u.organization_id != -1 && !orgMap.contains(u.organization_id)).foreach { u =>
-      throw new IllegalArgumentException(s"User links to non-existent Organisation: $u")
+    userList.find(u => u.organization_id != -1 && !orgMap.contains(u.organization_id)) match {
+      case Some(u) => throw new IllegalArgumentException(s"User links to non-existent Organisation: $u")
+      case None =>
+        val userMap = userList.map(u => u._id -> u).toMap
+        new Repository(orgMap, userMap)
     }
-
-    val userMap = userList.map(u => u._id -> u).toMap
-
-    new Repository(orgMap, userMap)
   }
 
   /**
