@@ -19,26 +19,9 @@ object Repository {
             ticketList: Seq[Ticket] = Nil): Repository = {
 
     val orgMap = orgList.map(o => o._id -> o).toMap
-
-    userList.find(u => u.organization_id != -1 && !orgMap.contains(u.organization_id)).foreach { u =>
-      throw new IllegalArgumentException(s"User links to non-existent Organisation: $u")
-    }
-
     val userMap = userList.map(u => u._id -> u).toMap
-
-    ticketList.find(t => t.organization_id != -1 && !orgMap.contains(t.organization_id)).foreach { t =>
-      throw new IllegalArgumentException(s"Ticket links to non-existent Organisation: $t")
-    }
-
-    ticketList.find(t => t.assignee_id != -1 && !userMap.contains(t.assignee_id)).foreach { t =>
-      throw new IllegalArgumentException(s"Ticket links to non-existent User as assignee: $t")
-    }
-
-    ticketList.find(t => t.submitter_id != -1 && !userMap.contains(t.submitter_id)).foreach { t =>
-      throw new IllegalArgumentException(s"Ticket links to non-existent User as submitter: $t")
-    }
-
     val ticketMap = ticketList.map(t => t._id -> t).toMap
+
     new Repository(orgMap, userMap, ticketMap)
   }
 
@@ -53,15 +36,15 @@ object Repository {
       f
     }
 
-    //    val ticketsFile = file("tickets.json")
-
     val organisationSeq = Future(Parser.parseOrgs(file("organizations.json")))
     val userSeq = Future(Parser.parseUsers(file("users.json")))
+    val ticketSeq = Future(Parser.parseTickets(file("tickets.json")))
 
     for {
       orgs <- organisationSeq
       users <- userSeq
-    } yield Repository(orgs, users)
+      tickets <- ticketSeq
+    } yield Repository(orgs, users, tickets)
   }
 
 }

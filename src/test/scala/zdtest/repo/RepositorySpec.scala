@@ -5,6 +5,7 @@ import java.io.File
 import org.scalacheck.Gen
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
+import scala.concurrent.duration._
 import zdtest.domain.{ArbitraryInput, Organisation, Ticket, User}
 
 class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryInput {
@@ -31,15 +32,11 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
       forall(usersMappedToOrgs) { u: User => actual.get(u._id) must beSome(u) }
     }.setGen1(Gen.nonEmptyListOf(genOrg)).set(minTestsOk = 10)
 
-    "fail to map when user is linked to non-existent organisation" >> prop { (u: User, o: Organisation) =>
-      val user = if (u.organization_id == o._id) u.copy(organization_id = u.organization_id + 1) else u
-      Repository(Seq(o), Seq(user)) must throwAn[IllegalArgumentException]
-    }.setGen1(genUser.suchThat(_.organization_id != -1))
-
     "map tickets" >> prop { (orgs: Seq[Organisation], users: Seq[User], tickets: Seq[Ticket]) =>
       val usersMappedToOrgs = users.zip(Stream.continually(orgs).flatten).zipWithIndex.map {
         case ((user: User, org: Organisation), id: Int) => user.copy(_id = id, organization_id = org._id)
       }
+
       val ticketsMappedToOrgsAndUsers = tickets.sortBy(_._id)
         .zip(Stream.continually(orgs).flatten)
         .zip(Stream.continually(usersMappedToOrgs).flatten).map {
@@ -57,24 +54,6 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
     }.setGen1(Gen.nonEmptyListOf(genOrg))
       .setGen2(Gen.nonEmptyListOf(genUser))
       .set(minTestsOk = 10)
-
-    "fail to map ticket when assignee is linked to non-existent user" >> prop { (t: Ticket, u: User, o: Organisation) =>
-      val user = u.copy(organization_id = o._id)
-      val ticket = t.copy(submitter_id = user._id, organization_id = o._id, assignee_id = user._id + 1)
-      Repository(Seq(o), Seq(user), Seq(ticket)) must throwAn[IllegalArgumentException]
-    }
-
-    "fail to map ticket when submitter is linked to non-existent user" >> prop { (t: Ticket, u: User, o: Organisation) =>
-      val user = u.copy(organization_id = o._id)
-      val ticket = t.copy(submitter_id = user._id + 1, organization_id = o._id, assignee_id = user._id)
-      Repository(Seq(o), Seq(user), Seq(ticket)) must throwAn[IllegalArgumentException]
-    }
-
-    "fail to map ticket when org is linked to non-existent organisation" >> prop { (t: Ticket, u: User, o: Organisation) =>
-      val user = u.copy(organization_id = o._id)
-      val ticket = t.copy(submitter_id = user._id, organization_id = o._id + 1, assignee_id = user._id)
-      Repository(Seq(o), Seq(user), Seq(ticket)) must throwAn[IllegalArgumentException]
-    }
   }
 
   "instantiating a repository from files" should {
@@ -84,7 +63,17 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
             containTheSameElementsAs(Parser.parseOrgs(new File("src/test/resources/organizations.json")))
           repo.users.values must
             containTheSameElementsAs(Parser.parseUsers(new File("src/test/resources/users.json")))
-      }.await
+          repo.tickets.values must
+            containTheSameElementsAs(Parser.parseTickets(new File("src/test/resources/tickets.json")))
+      }.awaitFor(5.seconds)
+    }
+
+    "fail if the dir is invalid" >> {
+      Repository.fromDir(new File("/foo")) must throwAn[IllegalArgumentException].await
+    }
+
+    "fail if the files are not present" >> {
+      Repository.fromDir(new File(".")) must throwAn[IllegalArgumentException].await
     }
   }
 
