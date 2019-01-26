@@ -4,7 +4,7 @@ import java.io.File
 import java.time.{OffsetDateTime, ZoneOffset}
 
 import org.specs2.mutable.Specification
-import zdtest.domain.{Organisation, User}
+import zdtest.domain.{Organisation, Ticket, User}
 
 class ParserSpec extends Specification {
 
@@ -42,6 +42,14 @@ class ParserSpec extends Specification {
           tags = Set("Vance", "Ray", "Jacobs", "Frank")
         )
       }
+    }
+
+    "fail to parse a file with non-json content" >> {
+      Parser.parseOrgs(file("not")) must throwAn[UnparseableFileException]
+    }
+
+    "fail to parse a file with incorrect json content" >> {
+      Parser.parseOrgs(file("single_ticket")) must throwAn[UnparseableFileException]
     }
   }
 
@@ -99,6 +107,49 @@ class ParserSpec extends Specification {
           role = "agent"
         )
       }
+    }
+
+    "fail to parse a file with non-json content" >> {
+      Parser.parseUsers(file("not")) must throwAn[UnparseableFileException]
+    }
+
+    "fail to parse a file with incorrect json content" >> {
+      Parser.parseUsers(file("single_org")) must throwAn[UnparseableFileException]
+    }
+  }
+
+  "parsing ticket files" should {
+    "parse an empty list" >> {
+      Parser.parseTickets(file("empty_list")) must beEmpty
+    }
+
+    "parse a single ticket" >> {
+      Parser.parseTickets(file("single_ticket")) mustEqual Seq(
+        Ticket(
+          _id = "1a227508-9f39-427c-8f57-1b72f3fab87c",
+          url = "http://initech.zendesk.com/api/v2/tickets/1a227508-9f39-427c-8f57-1b72f3fab87c.json",
+          external_id = "3e5ca820-cd1f-4a02-a18f-11b18e7bb49a",
+          created_at = OffsetDateTime.of(2016, 4, 14, 8, 32, 31, 0, ZoneOffset.ofHours(-10)),
+          `type` = "incident",
+          subject = "A Catastrophe in Micronesia",
+          description = "Aliquip excepteur fugiat ex minim ea aute eu labore. Sunt eiusmod esse eu non commodo est veniam consequat.",
+          priority = "low",
+          status = "hold",
+          submitter_id = 71,
+          assignee_id = 38,
+          organization_id = 112,
+          tags = Set("Puerto Rico", "Idaho", "Oklahoma", "Louisiana"),
+          due_at = OffsetDateTime.of(2016, 8, 15, 5, 37, 32, 0, ZoneOffset.ofHours(-10)),
+          via = "chat")
+      )
+    }
+
+    "fail to parse a file with non-json content" >> {
+      Parser.parseTickets(file("not")) must throwAn[UnparseableFileException]
+    }
+
+    "fail to parse a file with incorrect json content" >> {
+      Parser.parseTickets(file("single_user")) must throwAn[UnparseableFileException]
     }
   }
 
