@@ -38,6 +38,8 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
       Repository.fromDir(new File("src/test/resources")) must beLike[Repository] { case repo =>
           repo.organisations.values must
             containTheSameElementsAs(Parser.parseOrgs(new File("src/test/resources/organizations.json")))
+          repo.users.values must
+            containTheSameElementsAs(Parser.parseUsers(new File("src/test/resources/users.json")))
       }.await
     }
   }
