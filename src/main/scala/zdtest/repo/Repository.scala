@@ -2,19 +2,21 @@ package zdtest.repo
 
 import java.io.File
 
-import zdtest.domain.{Organisation, User}
+import zdtest.domain.{Organisation, Ticket, User}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class Repository(val organisations: Map[Long, Organisation] = Map.empty,
-                 val users: Map[Long, User] = Map.empty)
+                 val users: Map[Long, User] = Map.empty,
+                 val tickets: Map[String, Ticket] = Map.empty)
 
 object Repository {
 
   // todo - no duplicates in the seqs.
 
   def apply(orgList: Seq[Organisation] = Nil,
-            userList: Seq[User] = Nil): Repository = {
+            userList: Seq[User] = Nil,
+            ticketList: Seq[Ticket] = Nil): Repository = {
 
     val orgMap = orgList.map(o => o._id -> o).toMap
 
@@ -22,7 +24,8 @@ object Repository {
       case Some(u) => throw new IllegalArgumentException(s"User links to non-existent Organisation: $u")
       case None =>
         val userMap = userList.map(u => u._id -> u).toMap
-        new Repository(orgMap, userMap)
+        val ticketMap = ticketList.map(t => t._id -> t).toMap
+        new Repository(orgMap, userMap, ticketMap)
     }
   }
 
