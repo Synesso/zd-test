@@ -42,7 +42,7 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
       }
       val ticketsMappedToOrgsAndUsers = tickets.sortBy(_._id)
         .zip(Stream.continually(orgs).flatten)
-        .zip(Stream.continually(users).flatten).map {
+        .zip(Stream.continually(usersMappedToOrgs).flatten).map {
         case ((ticket: Ticket, org: Organisation), user: User) =>
           ticket.copy(
             submitter_id = user._id,
@@ -57,6 +57,24 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
     }.setGen1(Gen.nonEmptyListOf(genOrg))
       .setGen2(Gen.nonEmptyListOf(genUser))
       .set(minTestsOk = 10)
+
+    "fail to map ticket when assignee is linked to non-existent user" >> prop { (t: Ticket, u: User, o: Organisation) =>
+      val user = u.copy(organization_id = o._id)
+      val ticket = t.copy(submitter_id = user._id, organization_id = o._id, assignee_id = user._id + 1)
+      Repository(Seq(o), Seq(user), Seq(ticket)) must throwAn[IllegalArgumentException]
+    }
+
+    "fail to map ticket when submitter is linked to non-existent user" >> prop { (t: Ticket, u: User, o: Organisation) =>
+      val user = u.copy(organization_id = o._id)
+      val ticket = t.copy(submitter_id = user._id + 1, organization_id = o._id, assignee_id = user._id)
+      Repository(Seq(o), Seq(user), Seq(ticket)) must throwAn[IllegalArgumentException]
+    }
+
+    "fail to map ticket when org is linked to non-existent organisation" >> prop { (t: Ticket, u: User, o: Organisation) =>
+      val user = u.copy(organization_id = o._id)
+      val ticket = t.copy(submitter_id = user._id, organization_id = o._id + 1, assignee_id = user._id)
+      Repository(Seq(o), Seq(user), Seq(ticket)) must throwAn[IllegalArgumentException]
+    }
   }
 
   "instantiating a repository from files" should {

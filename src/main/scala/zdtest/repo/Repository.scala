@@ -20,13 +20,26 @@ object Repository {
 
     val orgMap = orgList.map(o => o._id -> o).toMap
 
-    userList.find(u => u.organization_id != -1 && !orgMap.contains(u.organization_id)) match {
-      case Some(u) => throw new IllegalArgumentException(s"User links to non-existent Organisation: $u")
-      case None =>
-        val userMap = userList.map(u => u._id -> u).toMap
-        val ticketMap = ticketList.map(t => t._id -> t).toMap
-        new Repository(orgMap, userMap, ticketMap)
+    userList.find(u => u.organization_id != -1 && !orgMap.contains(u.organization_id)).foreach { u =>
+      throw new IllegalArgumentException(s"User links to non-existent Organisation: $u")
     }
+
+    val userMap = userList.map(u => u._id -> u).toMap
+
+    ticketList.find(t => t.organization_id != -1 && !orgMap.contains(t.organization_id)).foreach { t =>
+      throw new IllegalArgumentException(s"Ticket links to non-existent Organisation: $t")
+    }
+
+    ticketList.find(t => t.assignee_id != -1 && !userMap.contains(t.assignee_id)).foreach { t =>
+      throw new IllegalArgumentException(s"Ticket links to non-existent User as assignee: $t")
+    }
+
+    ticketList.find(t => t.submitter_id != -1 && !userMap.contains(t.submitter_id)).foreach { t =>
+      throw new IllegalArgumentException(s"Ticket links to non-existent User as submitter: $t")
+    }
+
+    val ticketMap = ticketList.map(t => t._id -> t).toMap
+    new Repository(orgMap, userMap, ticketMap)
   }
 
   /**
