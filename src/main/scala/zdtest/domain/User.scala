@@ -20,7 +20,7 @@ case class User(_id: Long,
                 phone: String = "",
                 signature: String = "",
                 organization_id: Long = -1,
-                tags: Seq[String] = Nil,
+                tags: Set[String] = Set.empty,
                 suspended: Boolean = false,
                 role: String = "")
 

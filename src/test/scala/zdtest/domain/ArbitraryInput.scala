@@ -17,7 +17,7 @@ trait ArbitraryInput extends ScalaCheck {
     createdAt <- genOffsetDateTime
     details <- Gen.identifier
     sharedTickets <- genBool
-    tags <- Gen.listOf(Gen.identifier)
+    tags <- Gen.containerOf[Set, String](Gen.identifier)
   } yield Organisation(id, createdAt, url, externalId, name, domainNames, details, sharedTickets, tags)
 
   implicit val arbOrg: Arbitrary[Organisation] = Arbitrary(genOrg)
@@ -39,13 +39,35 @@ trait ArbitraryInput extends ScalaCheck {
     phone <- Gen.identifier
     signature <- Gen.identifier
     organization_id <- Gen.option(Gen.posNum[Long]).map(_.getOrElse(-1L))
-    tags <- Gen.listOf(Gen.identifier)
+    tags <- Gen.containerOf[Set, String](Gen.identifier)
     suspended <- genBool
     role <- Gen.identifier
   } yield User(id, created_at, last_login_at, url, external_id, name, alias, active, verified, shared, locale, timezone,
     email, phone, signature, organization_id, tags, suspended, role)
 
   implicit val arbUser: Arbitrary[User] = Arbitrary(genUser)
+
+  def genTicket: Gen[Ticket] = for {
+    id <- Gen.identifier
+    createdAt <- genOffsetDateTime
+    dueAt <- genOffsetDateTime
+    url <- Gen.identifier
+    external_id <- Gen.identifier
+    tpe <- Gen.identifier
+    subject <- Gen.identifier
+    description  <- Gen.identifier
+    priority <- Gen.identifier
+    status <- Gen.identifier
+    submitter_id <- Gen.option(Gen.posNum[Long]).map(_.getOrElse(-1L))
+    assignee_id <- Gen.option(Gen.posNum[Long]).map(_.getOrElse(-1L))
+    organization_id <- Gen.option(Gen.posNum[Long]).map(_.getOrElse(-1L))
+    tags <- Gen.containerOf[Set, String](Gen.identifier)
+    has_incidents <- genBool
+    via <- Gen.identifier
+  } yield Ticket(id, createdAt, dueAt, url, external_id, tpe, subject, description, priority, status, submitter_id,
+    assignee_id, organization_id, tags, has_incidents, via)
+
+  implicit val arbTicket: Arbitrary[Ticket] = Arbitrary(genTicket)
 
   def genOffsetDateTime: Gen[OffsetDateTime] = for {
     offset <- Gen.choose(-11, 11).map(ZoneOffset.ofHours)

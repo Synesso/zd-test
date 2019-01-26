@@ -23,8 +23,7 @@ class ParserSpec extends Specification {
           domain_names = Seq("gology.com", "myopium.com", "synkgen.com", "bolax.com"),
           created_at = OffsetDateTime.of(2016, 7, 23, 9, 48, 2, 0, ZoneOffset.ofHours(-10)),
           details = "Artisân",
-          shared_tickets = false,
-          tags = Seq("Nolan", "Rivas", "Morse", "Conway")
+          tags = Set("Nolan", "Rivas", "Morse", "Conway")
         )
       )
     }
@@ -40,8 +39,7 @@ class ParserSpec extends Specification {
           domain_names = Seq("techtrix.com", "teraprene.com", "corpulse.com", "flotonic.com"),
           created_at = OffsetDateTime.of(2016, 2, 21, 6, 11, 51, 0, ZoneOffset.ofHours(-11)),
           details = "MegaCorp",
-          shared_tickets = false,
-          tags = Seq("Vance", "Ray", "Jacobs", "Frank")
+          tags = Set("Vance", "Ray", "Jacobs", "Frank")
         )
       }
     }
@@ -71,7 +69,7 @@ class ParserSpec extends Specification {
           phone = "8925-633-579",
           signature = "Don't Worry Be Happy!",
           organization_id = 114,
-          tags = Seq("Whitehaven", "Omar", "Waiohinu", "Catharine"),
+          tags = Set("Whitehaven", "Omar", "Waiohinu", "Catharine"),
           suspended = true,
           role = "admin")
       )
@@ -96,7 +94,7 @@ class ParserSpec extends Specification {
           phone = "8615-883-099",
           signature = "Don't Worry Be Happy!",
           organization_id = 119,
-          tags = Seq("Veguita", "Navarre", "Elizaville", "Beaulieu"),
+          tags = Set("Veguita", "Navarre", "Elizaville", "Beaulieu"),
           suspended = true,
           role = "agent"
         )
