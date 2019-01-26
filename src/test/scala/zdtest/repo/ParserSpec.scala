@@ -144,6 +144,29 @@ class ParserSpec extends Specification {
       )
     }
 
+    "parse multiple tickets" >> {
+      Parser.parseTickets(file("many_tickets")) must beLike[Seq[Ticket]] { case xs =>
+        xs.size mustEqual 200
+        xs.drop(99).head mustEqual Ticket(
+          _id = "ffe688cd-402f-4e37-8597-88b3811bbf46",
+          url = "http://initech.zendesk.com/api/v2/tickets/ffe688cd-402f-4e37-8597-88b3811bbf46.json",
+          external_id = "a264d753-d2c3-4f50-ba8f-299bf8070f67",
+          created_at = OffsetDateTime.of(2016, 2, 3, 5, 47, 0, 0, ZoneOffset.ofHours(-11)),
+          `type` = "question",
+          subject = "A Problem in Vatican City Ştate (Holy See)",
+          description = "Ullamco enim id proident cillum tempor fugiat consequat non enim ad. Consectetur nostrud consequat deserunt consequat sit deserunt cillum esse eu ut fugiat.",
+          priority = "urgent",
+          status = "open",
+          submitter_id = 44,
+          assignee_id = 29,
+          organization_id = 104,
+          tags = Set("District Of Columbia", "Wisconsin", "Illinois", "Fédératéd Statés Of Micronésia"),
+          due_at = OffsetDateTime.of(2016, 8, 6, 7, 28, 38, 0, ZoneOffset.ofHours(-10)),
+          via = "web"
+        )
+      }
+    }
+
     "fail to parse a file with non-json content" >> {
       Parser.parseTickets(file("not")) must throwAn[UnparseableFileException]
     }

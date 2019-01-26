@@ -6,7 +6,7 @@ import upickle.default.{macroRW, ReadWriter => RW}
 
 case class Ticket(_id: String,
                   created_at: OffsetDateTime,
-                  due_at: OffsetDateTime,
+                  due_at: OffsetDateTime = OffsetDateTime.MIN,
                   url: String = "",
                   external_id: String = "",
                   `type`: String = "",

@@ -50,7 +50,7 @@ trait ArbitraryInput extends ScalaCheck {
   def genTicket: Gen[Ticket] = for {
     id <- Gen.identifier
     createdAt <- genOffsetDateTime
-    dueAt <- genOffsetDateTime
+    dueAt <- Gen.option(genOffsetDateTime).map(_.getOrElse(OffsetDateTime.MIN))
     url <- Gen.identifier
     external_id <- Gen.identifier
     tpe <- Gen.identifier
