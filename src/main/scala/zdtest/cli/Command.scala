@@ -1,0 +1,26 @@
+package zdtest.cli
+
+sealed trait Command
+
+object Command {
+
+  case object Quit extends Command
+  case object Help extends Command
+  case object Fields extends Command
+  case class Search(cat: Category, field: String, term: String) extends Command
+
+  def apply(s: String): Option[Command] = {
+    s.split("\\W").toSeq match {
+      case Seq("quit") | Seq("q") => Some(Quit)
+
+      case Seq("help") | Seq("h") => Some(Help)
+
+      case Seq("fields") => Some(Fields)
+
+      case "search" +: cat +: field +: term =>
+        Category.withName(cat).map(Search(_, field, term.mkString(" ")))
+
+      case _ => None
+    }
+  }
+}
