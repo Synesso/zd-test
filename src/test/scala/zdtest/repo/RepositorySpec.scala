@@ -17,43 +17,25 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
 
     "map organisations" >> prop { orgs: Seq[Organisation] =>
       val withDistinctIds = orgs.zipWithIndex.map{ case (org, i) => org.copy(_id = i) }
-      val actual = Repository(withDistinctIds).organisations
+      val actual = Repository(orgList = withDistinctIds).organisations
       actual.values.toSeq.sortBy(_._id) mustEqual withDistinctIds
       forall(withDistinctIds) { o: Organisation => actual.get(o._id) must beSome(o) }
-    }.set(minTestsOk = 10)
+    }
 
-    "map users" >> prop { (orgs: Seq[Organisation], users: Seq[User]) =>
-      val usersMappedToOrgs = users.zip(Stream.continually(orgs).flatten).zipWithIndex.map {
-        case ((user: User, org: Organisation), id: Int) => user.copy(_id = id, organization_id = org._id)
-      }
+    "map users" >> prop { (users: Seq[User]) =>
+      val withDistinctIds = users.zipWithIndex.map { case (user, i) => user.copy(_id = i) }
+      val actual = Repository(userList = withDistinctIds).users
+      actual.values.toSeq.sortBy(_._id) mustEqual withDistinctIds
+      forall(withDistinctIds) { u: User => actual.get(u._id) must beSome(u) }
+    }
 
-      val actual = Repository(orgs, usersMappedToOrgs).users
-      actual.values.toSeq.sortBy(_._id) mustEqual usersMappedToOrgs
-      forall(usersMappedToOrgs) { u: User => actual.get(u._id) must beSome(u) }
-    }.setGen1(Gen.nonEmptyListOf(genOrg)).set(minTestsOk = 10)
+    "map tickets" >> prop { (tickets: Seq[Ticket]) =>
+      val withDistinctIds = tickets.map(t => t._id -> t).toMap.values.toSeq
+      val actual = Repository(ticketList = withDistinctIds).tickets
+      actual.values must containTheSameElementsAs(withDistinctIds)
+      forall(withDistinctIds) { t: Ticket => actual.get(t._id) must beSome(t) }
+    }
 
-    "map tickets" >> prop { (orgs: Seq[Organisation], users: Seq[User], tickets: Seq[Ticket]) =>
-      val usersMappedToOrgs = users.zip(Stream.continually(orgs).flatten).zipWithIndex.map {
-        case ((user: User, org: Organisation), id: Int) => user.copy(_id = id, organization_id = org._id)
-      }
-
-      val ticketsMappedToOrgsAndUsers = tickets.sortBy(_._id)
-        .zip(Stream.continually(orgs).flatten)
-        .zip(Stream.continually(usersMappedToOrgs).flatten).map {
-        case ((ticket: Ticket, org: Organisation), user: User) =>
-          ticket.copy(
-            submitter_id = user._id,
-            assignee_id = user._id,
-            organization_id = org._id)
-      }
-
-      val actual = Repository(orgs, usersMappedToOrgs, ticketsMappedToOrgsAndUsers).tickets
-      actual.values.toSeq.sortBy(_._id) mustEqual ticketsMappedToOrgsAndUsers
-      forall(ticketsMappedToOrgsAndUsers) { t: Ticket => actual.get(t._id) must beSome(t) }
-
-    }.setGen1(Gen.nonEmptyListOf(genOrg))
-      .setGen2(Gen.nonEmptyListOf(genUser))
-      .set(minTestsOk = 10)
   }
 
   "instantiating a repository from files" should {
