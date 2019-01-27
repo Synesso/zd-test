@@ -10,7 +10,7 @@ object Command {
   case class Search(cat: Category, field: String, term: String) extends Command
 
   def apply(s: String): Option[Command] = {
-    s.split("\\W").toSeq match {
+    s.split("\\s").toSeq match {
       case Seq("quit") | Seq("q") => Some(Quit)
 
       case Seq("help") | Seq("h") => Some(Help)

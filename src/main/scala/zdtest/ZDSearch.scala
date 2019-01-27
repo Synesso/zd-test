@@ -25,26 +25,27 @@ object ZDSearch {
       promptLoop(scala.io.StdIn.readLine(), repo)
     }
 
-    userLoop.failed.foreach { t =>
+    val resultCode = userLoop.map(_ => 0).recover { case t =>
       System.err.println(s"Unable to initialise: ${t.getMessage}")
       System.err.println(usageMessage)
+      -1
     }
 
-    Await.ready(userLoop, Duration.Inf)
+    System.exit(Await.result(resultCode, Duration.Inf))
   }
 
-  def promptLoop(readUserLine: => String, repo: Repository): Unit = {
+  def promptLoop(readUserLine: => String, repo: Repository, act: String => Unit = println, prompt: String => Unit = println): Unit = {
     @tailrec
     def loop(): Unit = {
-      print("> ")
+      prompt("> ")
       Option(readUserLine).flatMap(Command(_)) match {
         case Some(Quit) =>
         case other =>
           other match {
-            case Some(Help) => println(helpMessage)
-            case Some(Fields) => println(fieldsMessage)
-            case Some(s: Search) => repo.users.foreach(println)
-            case _ => println("command not recognised")
+            case Some(Help) => act(helpMessage)
+            case Some(Fields) => act(fieldsMessage)
+            case Some(s: Search) => repo.users.map(_.toString).foreach(act)
+            case _ => act("command not recognised")
           }
           loop()
       }
@@ -97,9 +98,5 @@ object ZDSearch {
       |   data_dir     - the directory containing the data files organizations.json, tickets.json & users.json
       |
     """.stripMargin
-  }
-
-  def searchAndPrintResults(dir: File, category: Category, field: String, term: String): Unit = {
-
   }
 }

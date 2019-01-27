@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit
 
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.ScalaCheck
+import zdtest.cli.{Category, OrgCat, TicketCat, UserCat}
 
 trait ArbitraryInput extends ScalaCheck {
 
@@ -68,6 +69,12 @@ trait ArbitraryInput extends ScalaCheck {
     assignee_id, organization_id, tags, has_incidents, via)
 
   implicit val arbTicket: Arbitrary[Ticket] = Arbitrary(genTicket)
+
+  def genCategory: Gen[Category] = Gen.oneOf(UserCat, OrgCat, TicketCat)
+
+  implicit val arbCategory: Arbitrary[Category] = Arbitrary(genCategory)
+
+  def genNonEmptyString: Gen[String] = Arbitrary.arbString.arbitrary.suchThat(_.nonEmpty)
 
   def genOffsetDateTime: Gen[OffsetDateTime] = for {
     offset <- Gen.choose(-11, 11).map(ZoneOffset.ofHours)

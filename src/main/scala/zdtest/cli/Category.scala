@@ -1,10 +1,12 @@
 package zdtest.cli
 
 sealed trait Category {
+  val name: String
   val fields: Seq[String]
 }
 
 case object UserCat extends Category {
+  val name = "user"
   val fields: Seq[String] = Seq(
     "_id",
     "url",
@@ -28,6 +30,7 @@ case object UserCat extends Category {
 }
 
 case object OrgCat extends Category {
+  val name = "organisation"
   val fields: Seq[String] = Seq(
     "_id",
     "url",
@@ -41,6 +44,7 @@ case object OrgCat extends Category {
 }
 
 case object TicketCat extends Category {
+  val name = "ticket"
   val fields: Seq[String] = Seq(
     "_id",
     "url",
