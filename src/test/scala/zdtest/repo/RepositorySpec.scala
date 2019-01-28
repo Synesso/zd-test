@@ -50,7 +50,7 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
           containTheSameElementsAs(Parser.parseUsers(new File("src/test/resources/users.json")))
         repo.tickets.values must
           containTheSameElementsAs(Parser.parseTickets(new File("src/test/resources/tickets.json")))
-      }.awaitFor(30.seconds) // for travis
+      }.awaitFor(5.seconds)
     }
 
     "fail if the dir is invalid" >> {
