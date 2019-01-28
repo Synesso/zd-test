@@ -8,7 +8,7 @@ class TrieSpec extends Specification with ScalaCheck {
 
   "a builder" should {
     "create an empty trie when nothing is added" >> {
-      new TrieBuilder().build mustEqual Trie()
+      new TrieBuilder[Long]().build mustEqual Trie[Long]()
     }
 
     "create a trie with a single character entry" >> {
@@ -74,7 +74,7 @@ class TrieSpec extends Specification with ScalaCheck {
     }
 
     "create a trie with arbitrary keys and values" >> prop { kvp: Seq[(String, Long)] =>
-      val trie = kvp.foldLeft(new TrieBuilder()) { case (acc, (k, v)) => acc.add(k, v) }.build
+      val trie = kvp.foldLeft(new TrieBuilder[Long]()) { case (acc, (k, v)) => acc.add(k, v) }.build
       forall(kvp) { case (key, value) => trie.search(key) must contain(value) }
     }.setGen(Gen.listOf(for {
       key <- Gen.identifier

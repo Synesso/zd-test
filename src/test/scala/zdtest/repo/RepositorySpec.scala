@@ -2,11 +2,11 @@ package zdtest.repo
 
 import java.io.File
 
-import org.scalacheck.Gen
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
-import scala.concurrent.duration._
 import zdtest.domain.{ArbitraryInput, Organisation, Ticket, User}
+
+import scala.concurrent.duration._
 
 class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryInput {
 
@@ -15,21 +15,24 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
       Repository() must not(throwAn[Exception])
     }
 
-    "map organisations" >> prop { orgs: Seq[Organisation] =>
-      val withDistinctIds = orgs.zipWithIndex.map{ case (org, i) => org.copy(_id = i) }
+    "map organisations" >> {
+      val orgs = (0 to 100).flatMap(_ => genOrg.sample)
+      val withDistinctIds = orgs.zipWithIndex.map { case (org, i) => org.copy(_id = i) }
       val actual = Repository(orgList = withDistinctIds).organisations
       actual.values.toSeq.sortBy(_._id) mustEqual withDistinctIds
       forall(withDistinctIds) { o: Organisation => actual.get(o._id) must beSome(o) }
     }
 
-    "map users" >> prop { (users: Seq[User]) =>
+    "map users" >> {
+      val users = (0 to 100).flatMap(_ => genUser.sample)
       val withDistinctIds = users.zipWithIndex.map { case (user, i) => user.copy(_id = i) }
       val actual = Repository(userList = withDistinctIds).users
       actual.values.toSeq.sortBy(_._id) mustEqual withDistinctIds
       forall(withDistinctIds) { u: User => actual.get(u._id) must beSome(u) }
     }
 
-    "map tickets" >> prop { (tickets: Seq[Ticket]) =>
+    "map tickets" >> {
+      val tickets = (0 to 100).flatMap(_ => genTicket.sample)
       val withDistinctIds = tickets.map(t => t._id -> t).toMap.values.toSeq
       val actual = Repository(ticketList = withDistinctIds).tickets
       actual.values must containTheSameElementsAs(withDistinctIds)
@@ -41,12 +44,12 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
   "instantiating a repository from files" should {
     "build correctly with sample data" >> {
       Repository.fromDir(new File("src/test/resources")) must beLike[Repository] { case repo =>
-          repo.organisations.values must
-            containTheSameElementsAs(Parser.parseOrgs(new File("src/test/resources/organizations.json")))
-          repo.users.values must
-            containTheSameElementsAs(Parser.parseUsers(new File("src/test/resources/users.json")))
-          repo.tickets.values must
-            containTheSameElementsAs(Parser.parseTickets(new File("src/test/resources/tickets.json")))
+        repo.organisations.values must
+          containTheSameElementsAs(Parser.parseOrgs(new File("src/test/resources/organizations.json")))
+        repo.users.values must
+          containTheSameElementsAs(Parser.parseUsers(new File("src/test/resources/users.json")))
+        repo.tickets.values must
+          containTheSameElementsAs(Parser.parseTickets(new File("src/test/resources/tickets.json")))
       }.awaitFor(5.seconds)
     }
 

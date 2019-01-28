@@ -3,14 +3,15 @@ package zdtest.repo
 import java.io.File
 
 import zdtest.domain.{Organisation, Ticket, User}
+import zdtest.search.Index
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class Repository(val organisations: Map[Long, Organisation] = Map.empty,
                  val users: Map[Long, User] = Map.empty,
-                 val tickets: Map[String, Ticket] = Map.empty) {
+                 val tickets: Map[String, Ticket] = Map.empty)(implicit ec: ExecutionContext) {
 
-
+  val index: Future[Index] = Index.build(organisations.values, users.values, tickets.values)
 
 }
 
@@ -18,7 +19,7 @@ object Repository {
 
   def apply(orgList: Seq[Organisation] = Nil,
             userList: Seq[User] = Nil,
-            ticketList: Seq[Ticket] = Nil): Repository = {
+            ticketList: Seq[Ticket] = Nil)(implicit ec: ExecutionContext): Repository = {
 
     val orgMap = orgList.map(o => o._id -> o).toMap
     val userMap = userList.map(u => u._id -> u).toMap
