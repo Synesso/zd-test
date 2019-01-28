@@ -1,9 +1,10 @@
 package zdtest.search
 
+import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.ScalaCheck
 import org.specs2.mutable.Specification
 
-class TrieBuilderSpec extends Specification with ScalaCheck {
+class TrieSpec extends Specification with ScalaCheck {
 
   "a builder" should {
     "create an empty trie when nothing is added" >> {
@@ -73,12 +74,39 @@ class TrieBuilderSpec extends Specification with ScalaCheck {
     }
 
     "create a trie with arbitrary keys and values" >> prop { kvp: Seq[(String, Long)] =>
-//      val trie =
-        kvp.foldLeft(new TrieBuilder()) { case (acc, (k, v)) => acc.add(k, v) }.build must not(throwAn[Exception])
-//      forall(kvp) { case (key, value) => trie.search(key) must contain(value) } // todo
-
-    }
+      val trie = kvp.foldLeft(new TrieBuilder()) { case (acc, (k, v)) => acc.add(k, v) }.build
+      forall(kvp) { case (key, value) => trie.search(key) must contain(value) }
+    }.setGen(Gen.listOf(for {
+      key <- Gen.identifier
+      value <- Gen.posNum[Long]
+    } yield (key, value)))
   }
 
+  "searching a trie" should {
+    val trie = new TrieBuilder().add("plasma", 1).add("banana", 2).add("phantasma", 3).build
 
+    "provide full-match results" >> {
+      trie.search("plasma") mustEqual Set(1)
+    }
+
+    "provide results for partial-match on head" >> {
+      trie.search("p") mustEqual Set(1, 3)
+    }
+
+    "provide results for partial-match on middle" >> {
+      trie.search("an") mustEqual Set(2, 3)
+    }
+
+    "provide results for partial-match on tail" >> {
+      trie.search("asma") mustEqual Set(1, 3)
+    }
+
+    "provide results for match on common term" >> {
+      trie.search("a") mustEqual Set(1, 2, 3)
+    }
+
+    "provide no results for no match" >> {
+      trie.search("quanta") must beEmpty
+    }
+  }
 }

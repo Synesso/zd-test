@@ -1,8 +1,20 @@
 package zdtest.search
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 case class Trie(sub: Map[Char, Trie] = Map.empty, res: Set[Long] = Set.empty) {
+
+  @tailrec
+  final def search(term: String): Set[Long] = term match {
+    case "" => results
+    case _ => sub.get(term.head) match {
+      case None => Set.empty
+      case Some(trie) => trie.search(term.tail)
+    }
+  }
+
+  private[search] def results: Set[Long] = res ++ sub.values.flatMap(_.results)
 }
 
 class TrieBuilder {
