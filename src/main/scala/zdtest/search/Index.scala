@@ -7,6 +7,7 @@ import zdtest.domain._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
 
+// todo - requires a spec
 class Index(val orgs: Map[String, Trie[String, Organisation]],
             val users: Map[String, Trie[String, User]],
             val tickets: Map[String, Trie[String, Ticket]]) {
@@ -14,9 +15,9 @@ class Index(val orgs: Map[String, Trie[String, Organisation]],
 
   def search(cat: Category[_], field: String, term: String): Seq[Searchable] = {
     cat match {
-      case OrgCat => orgs.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values)
-      case UserCat => users.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values)
-      case TicketCat => tickets.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values)
+      case OrgCat => orgs.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values).distinct
+      case UserCat => users.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values).distinct
+      case TicketCat => tickets.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values).distinct
     }
   }
 }

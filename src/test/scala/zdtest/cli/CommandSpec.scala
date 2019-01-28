@@ -9,7 +9,7 @@ class CommandSpec extends Specification with ArbitraryInput {
 
   "parsing a command" should {
     "parse an empty string to no-op" >> {
-      Command("") must beSome(NoOp)
+      Command("") must beSome[Command](NoOp)
     }
 
     "parse 'quit' to Quit" >> {
