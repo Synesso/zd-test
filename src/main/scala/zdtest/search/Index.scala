@@ -1,13 +1,15 @@
 package zdtest.search
 
+import org.apache.commons.collections4.Trie
+import org.apache.commons.collections4.trie.PatriciaTrie
 import zdtest.domain._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.collection.JavaConverters._
 
-class Index(orgs: Map[String, Trie[Long]],
-            users: Map[String, Trie[Long]],
-            tickets: Map[String, Trie[String]]) {
-
+class Index(val orgs: Map[String, Trie[String, Organisation]],
+            val users: Map[String, Trie[String, User]],
+            val tickets: Map[String, Trie[String, Ticket]]) {
 
 
 }
@@ -18,20 +20,25 @@ object Index {
             users: Iterable[User] = Nil,
             tickets: Iterable[Ticket] = Nil)(implicit ec: ExecutionContext): Future[Index] = {
 
-    def trie[T, V](ts: Iterable[T], value: T => String, id: T => V): Future[Trie[V]] = Future(
-      ts.foldLeft(new TrieBuilder[V]()) { case (tb, t) => tb.add(value(t), id(t)) }.build
-    )
+    def trie[T](ts: Iterable[T], key: T => String): Future[Trie[String, T]] = Future {
+      val variants = ts.flatMap { t =>
+        val k = key(t)
+        val ks = (0 until k.length).map(k.drop)
+        ks.map(_ -> t)
+      }.toMap.asJava
+      new PatriciaTrie(variants)
+    }
 
     val orgTrie = Future.sequence(OrgCat.fields.toSeq.map { case (name, extractor) =>
-      trie(organisations, extractor, (_: Organisation)._id).map(name -> _)
+      trie(organisations, extractor).map(name -> _)
     }).map(_.toMap)
 
     val userTrie = Future.sequence(UserCat.fields.toSeq.map { case (name, extractor) =>
-      trie(users, extractor, (_: User)._id).map(name -> _)
+      trie(users, extractor).map(name -> _)
     }).map(_.toMap)
 
     val ticketTrie = Future.sequence(TicketCat.fields.toSeq.map { case (name, extractor) =>
-      trie(tickets, extractor, (_: Ticket)._id).map(name -> _)
+      trie(tickets, extractor).map(name -> _)
     }).map(_.toMap)
 
     for {

@@ -8,6 +8,7 @@ lazy val root = (project in file("."))
     fork := true,
     libraryDependencies ++= List(
       "com.lihaoyi" %% "upickle" % "0.7.1",
+      "org.apache.commons" % "commons-collections4" % "4.2",
       "org.specs2" %% "specs2-core" % "4.3.6" % "test,it",
       "org.specs2" %% "specs2-scalacheck" % "4.3.6" % "test"
     )

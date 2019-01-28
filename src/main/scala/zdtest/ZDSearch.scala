@@ -3,10 +3,11 @@ package zdtest
 import java.io.File
 import java.util.Locale
 
-import zdtest.cli.Command.{Fields, Help, Quit, Search}
 import zdtest.cli.Command
+import zdtest.cli.Command.{Fields, Help, Quit, Search}
 import zdtest.domain.Category
 import zdtest.repo.Repository
+import zdtest.search.Index
 
 import scala.annotation.tailrec
 import scala.concurrent.Await
@@ -16,14 +17,18 @@ import scala.concurrent.duration.Duration
 object ZDSearch {
 
   def main(args: Array[String]): Unit = {
-    val userLoop = Repository.fromDir(new File(args.headOption.getOrElse("."))).map { repo =>
+
+    val userLoop = (for {
+      repo <- Repository.fromDir(new File(args.headOption.getOrElse(".")))
+      index <- repo.index
+    } yield (repo, index)).map { case (repo: Repository, index: Index) =>
       println(
         s"""Welcome to Zendesk Search.
            |Indexed ${repo.users.size} users, ${repo.organisations.size} organizations and ${repo.tickets.size} tickets.
            |
            |Looking for user input: 'search ...', 'fields', 'help' or 'quit'.
          """.stripMargin)
-      promptLoop(scala.io.StdIn.readLine(), repo)
+      promptLoop(scala.io.StdIn.readLine(), repo, index)
     }
 
     val resultCode = userLoop.map(_ => 0).recover { case t =>
@@ -35,7 +40,8 @@ object ZDSearch {
     System.exit(Await.result(resultCode, Duration.Inf))
   }
 
-  def promptLoop(readUserLine: => String, repo: Repository, act: String => Unit = println, prompt: String => Unit = println): Unit = {
+  def promptLoop(readUserLine: => String, repo: Repository, index: Index,
+                 act: String => Unit = println, prompt: String => Unit = println): Unit = {
     @tailrec
     def loop(): Unit = {
       prompt("> ")

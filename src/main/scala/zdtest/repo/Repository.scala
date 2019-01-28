@@ -11,8 +11,10 @@ class Repository(val organisations: Map[Long, Organisation] = Map.empty,
                  val users: Map[Long, User] = Map.empty,
                  val tickets: Map[String, Ticket] = Map.empty)(implicit ec: ExecutionContext) {
 
-  // lazy to prevent Future explosion during testing
-  lazy val index: Future[Index] = Index.build(organisations.values, users.values, tickets.values)
+  // lazy to prevent Future explosion & thread starvation during testing
+  private lazy val _index: Future[Index] = Index.build(organisations.values, users.values, tickets.values)
+
+  def index: Future[Index] = _index
 
 }
 

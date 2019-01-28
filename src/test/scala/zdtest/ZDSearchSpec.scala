@@ -8,50 +8,53 @@ import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
 import zdtest.domain.ArbitraryInput
 import zdtest.repo.Repository
+import zdtest.search.Index
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
 
 class ZDSearchSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryInput {
 
   sequential
 
-  val repo = Repository(userList = Seq(genUser.sample.get))
-  val ignore: String => Unit = _ => Unit
+  private val repo = Repository(userList = Seq(genUser.sample.get))
+  private val index = Await.result(repo.index, 10.seconds)
+  private val ignore: String => Unit = _ => Unit
 
   "interactive user prompt loop" should {
     "allow user to quit" >> {
       val (i, o) = (new UserInput("quit"), new CommandOutput)
-      Future(ZDSearch.promptLoop(i.read, repo, o.write, ignore)) must beEqualTo(()).await
+      Future(ZDSearch.promptLoop(i.read, repo, index, o.write, ignore)) must beEqualTo(()).await
       o.results must beEmpty
     }
 
     "allow help command" >> {
       val (i, o) = (new UserInput("help", "q"), new CommandOutput)
-      Future(ZDSearch.promptLoop(i.read, repo, o.write, ignore)) must beEqualTo(()).await
+      Future(ZDSearch.promptLoop(i.read, repo, index, o.write, ignore)) must beEqualTo(()).await
       o.results mustEqual Seq(ZDSearch.helpMessage)
     }
 
     "allow help alias" >> {
       val (i, o) = (new UserInput("h", "q"), new CommandOutput)
-      Future(ZDSearch.promptLoop(i.read, repo, o.write, ignore)) must beEqualTo(()).await
+      Future(ZDSearch.promptLoop(i.read, repo, index, o.write, ignore)) must beEqualTo(()).await
       o.results mustEqual Seq(ZDSearch.helpMessage)
     }
 
     "allow fields command" >> {
       val (i, o) = (new UserInput("fields", "q"), new CommandOutput)
-      Future(ZDSearch.promptLoop(i.read, repo, o.write, ignore)) must beEqualTo(()).await
+      Future(ZDSearch.promptLoop(i.read, repo, index, o.write, ignore)) must beEqualTo(()).await
       o.results mustEqual Seq(ZDSearch.fieldsMessage)
     }
 
     "allow search command" >> {
       val (i, o) = (new UserInput(s"search user _id ${repo.users.keys.head}", "q"), new CommandOutput)
-      Future(ZDSearch.promptLoop(i.read, repo, o.write, ignore)) must beEqualTo(()).await
+      Future(ZDSearch.promptLoop(i.read, repo, index, o.write, ignore)) must beEqualTo(()).await
       o.results must not(beEmpty)
     }
 
     "never crash" >> prop { s: String =>
       val (i, o) = (new UserInput(s, "quit"), new CommandOutput)
-      Future(ZDSearch.promptLoop(i.read, repo, o.write, ignore)) must beEqualTo(()).await
+      Future(ZDSearch.promptLoop(i.read, repo, index, o.write, ignore)) must beEqualTo(()).await
     }.setGen(Gen.identifier)
   }
 
@@ -71,7 +74,7 @@ class ZDSearchSpec(implicit ee: ExecutionEnv) extends Specification with Arbitra
       try {
         val loop = Future(ZDSearch.main(Array("src/test/resources")))
         System.setIn(new ByteArrayInputStream(s"quit${System.lineSeparator()}".getBytes))
-        loop must throwAn[ExitException](ExitException(0)).await
+        loop must throwAn[ExitException](ExitException(0)).awaitFor(1.minute)
       } finally {
         System.setSecurityManager(null)
         System.setIn(in)
