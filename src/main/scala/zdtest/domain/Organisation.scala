@@ -10,7 +10,7 @@ case class Organisation(_id: Long,
                         domain_names: Seq[String] = Nil,
                         details: String = "",
                         shared_tickets: Boolean = false,
-                        tags: Set[String] = Set.empty)
+                        tags: Set[String] = Set.empty) extends Searchable
 
 object Organisation extends CommonRW {
   import upickle.default._

@@ -4,7 +4,7 @@ import java.io.File
 import java.util.Locale
 
 import zdtest.cli.Command
-import zdtest.cli.Command.{Fields, Help, Quit, Search}
+import zdtest.cli.Command._
 import zdtest.domain.Category
 import zdtest.repo.Repository
 import zdtest.search.Index
@@ -41,7 +41,7 @@ object ZDSearch {
   }
 
   def promptLoop(readUserLine: => String, repo: Repository, index: Index,
-                 act: String => Unit = println, prompt: String => Unit = println): Unit = {
+                 act: String => Unit = println, prompt: String => Unit = print): Unit = {
     @tailrec
     def loop(): Unit = {
       prompt("> ")
@@ -49,9 +49,10 @@ object ZDSearch {
         case Some(Quit) =>
         case other =>
           other match {
+            case Some(NoOp) =>
             case Some(Help) => act(helpMessage)
             case Some(Fields) => act(fieldsMessage)
-            case Some(s: Search) => repo.users.map(_.toString).foreach(act)
+            case Some(Search(cat, field, term)) => index.search(cat, field, term).map(repo.asString).foreach(act)
             case _ => act("command not recognised")
           }
           loop()

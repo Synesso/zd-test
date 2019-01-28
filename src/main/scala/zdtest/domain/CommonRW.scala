@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter
 
 import upickle.default._
 
+trait Searchable
+
 trait CommonRW {
   implicit val dateTimeRW: ReadWriter[OffsetDateTime] = {
     readwriter[String].bimap[OffsetDateTime](

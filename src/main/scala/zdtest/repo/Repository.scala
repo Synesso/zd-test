@@ -2,7 +2,7 @@ package zdtest.repo
 
 import java.io.File
 
-import zdtest.domain.{Organisation, Ticket, User}
+import zdtest.domain.{Organisation, Searchable, Ticket, User}
 import zdtest.search.Index
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,6 +16,7 @@ class Repository(val organisations: Map[Long, Organisation] = Map.empty,
 
   def index: Future[Index] = _index
 
+  def asString(s: Searchable): String = s.toString
 }
 
 object Repository {

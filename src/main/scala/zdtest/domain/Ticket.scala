@@ -19,7 +19,7 @@ case class Ticket(_id: String,
                   organization_id: Long = -1,
                   tags: Set[String] = Set.empty,
                   has_incidents: Boolean = false,
-                  via: String = "")
+                  via: String = "") extends Searchable
 
 object Ticket extends CommonRW {
   implicit val rw: RW[Ticket] = macroRW

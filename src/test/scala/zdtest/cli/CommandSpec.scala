@@ -2,14 +2,14 @@ package zdtest.cli
 
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.mutable.Specification
-import zdtest.cli.Command.{Fields, Help, Quit, Search}
+import zdtest.cli.Command._
 import zdtest.domain.{ArbitraryInput, Category, UserCat}
 
 class CommandSpec extends Specification with ArbitraryInput {
 
   "parsing a command" should {
-    "parse an empty string to nothing" >> {
-      Command("") must beNone
+    "parse an empty string to no-op" >> {
+      Command("") must beSome(NoOp)
     }
 
     "parse 'quit' to Quit" >> {

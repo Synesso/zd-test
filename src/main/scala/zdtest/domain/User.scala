@@ -22,7 +22,7 @@ case class User(_id: Long,
                 organization_id: Long = -1,
                 tags: Set[String] = Set.empty,
                 suspended: Boolean = false,
-                role: String = "")
+                role: String = "") extends Searchable
 
 object User extends CommonRW {
   implicit val rw: RW[User] = macroRW
