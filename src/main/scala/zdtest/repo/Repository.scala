@@ -11,6 +11,7 @@ class Repository(val organisations: Map[Long, Organisation] = Map.empty,
                  val tickets: Map[String, Ticket] = Map.empty) {
 
 
+
 }
 
 object Repository {

@@ -69,9 +69,9 @@ trait ArbitraryInput extends ScalaCheck {
 
   implicit val arbTicket: Arbitrary[Ticket] = Arbitrary(genTicket)
 
-  def genCategory: Gen[Category] = Gen.oneOf(UserCat, OrgCat, TicketCat)
+  def genCategory: Gen[Category[_]] = Gen.oneOf(UserCat, OrgCat, TicketCat)
 
-  implicit val arbCategory: Arbitrary[Category] = Arbitrary(genCategory)
+  implicit val arbCategory: Arbitrary[Category[_]] = Arbitrary(genCategory)
 
   def genNonEmptyString: Gen[String] = Arbitrary.arbString.arbitrary.suchThat(_.nonEmpty)
 

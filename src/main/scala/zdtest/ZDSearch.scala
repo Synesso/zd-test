@@ -81,7 +81,7 @@ object ZDSearch {
     Seq("User", "Organisation", "Ticket").flatMap { s =>
       Category.withName(s.toLowerCase(Locale.ROOT)).map(s -> _)
     }.map { case (s, cat) =>
-      val fieldsString = cat.fields.sorted.map("* " + _).mkString(System.lineSeparator())
+      val fieldsString = cat.fields.keys.toSeq.sorted.map("* " + _).mkString(System.lineSeparator())
 
       s"""
          |Search $s with one of

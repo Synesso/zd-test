@@ -13,6 +13,6 @@ object Index {
 
 class Index {
 
-  private val data: Map[Category, Map[String, Trie]] = Map.empty
+  private val data: Map[Category[_], Map[String, Trie]] = Map.empty
 
 }

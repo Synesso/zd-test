@@ -32,7 +32,7 @@ class CommandSpec extends Specification with ArbitraryInput {
       Command("fields") must beSome[Command](Fields)
     }
 
-    "parse 'search' with the correct quantity of parameters" >> prop { (cat: Category, field: String, term: String) =>
+    "parse 'search' with the correct quantity of parameters" >> prop { (cat: Category[_], field: String, term: String) =>
       Command(s"search ${cat.name} $field $term") must beSome[Command](Search(cat, field, term))
     }.setGen2(Gen.identifier).setGen3(Gen.identifier)
 
