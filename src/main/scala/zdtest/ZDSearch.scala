@@ -4,7 +4,8 @@ import java.io.File
 import java.util.Locale
 
 import zdtest.cli.Command.{Fields, Help, Quit, Search}
-import zdtest.cli.{Category, Command}
+import zdtest.cli.Command
+import zdtest.domain.Category
 import zdtest.repo.Repository
 
 import scala.annotation.tailrec

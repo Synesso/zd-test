@@ -3,7 +3,7 @@ package zdtest.cli
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.mutable.Specification
 import zdtest.cli.Command.{Fields, Help, Quit, Search}
-import zdtest.domain.ArbitraryInput
+import zdtest.domain.{ArbitraryInput, Category, UserCat}
 
 class CommandSpec extends Specification with ArbitraryInput {
 

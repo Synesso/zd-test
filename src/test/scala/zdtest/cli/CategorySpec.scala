@@ -2,7 +2,7 @@ package zdtest.cli
 
 import org.scalacheck.Gen
 import org.specs2.mutable.Specification
-import zdtest.domain.ArbitraryInput
+import zdtest.domain._
 
 class CategorySpec extends Specification with ArbitraryInput {
 

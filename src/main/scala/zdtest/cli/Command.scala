@@ -1,5 +1,7 @@
 package zdtest.cli
 
+import zdtest.domain.Category
+
 sealed trait Command
 
 object Command {

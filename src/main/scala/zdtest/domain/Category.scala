@@ -1,4 +1,4 @@
-package zdtest.cli
+package zdtest.domain
 
 sealed trait Category {
   val name: String

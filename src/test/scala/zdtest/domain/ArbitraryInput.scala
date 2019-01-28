@@ -5,7 +5,6 @@ import java.time.temporal.ChronoUnit
 
 import org.scalacheck.{Arbitrary, Gen}
 import org.specs2.ScalaCheck
-import zdtest.cli.{Category, OrgCat, TicketCat, UserCat}
 
 trait ArbitraryInput extends ScalaCheck {
 

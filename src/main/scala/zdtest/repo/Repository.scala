@@ -8,11 +8,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class Repository(val organisations: Map[Long, Organisation] = Map.empty,
                  val users: Map[Long, User] = Map.empty,
-                 val tickets: Map[String, Ticket] = Map.empty)
+                 val tickets: Map[String, Ticket] = Map.empty) {
+
+
+}
 
 object Repository {
-
-  // todo - no duplicates in the seqs.
 
   def apply(orgList: Seq[Organisation] = Nil,
             userList: Seq[User] = Nil,
