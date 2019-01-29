@@ -68,10 +68,13 @@ object ZDSearch {
     """Choose from the following commands:
       |
       |* search
-      |Prints elements from the given category where the field partially or fully matches the value. The
+      |Prints elements from the given category where the field partially or fully matches the given term.
       |Category must be one of {'user', 'ticket', 'organisation'}.
+      |Field must be a valid field for the category (see `fields`).
+      |Term is a case insensitive-match on the prefix of any word in value of the field.
+      |   Term may be omitted, in which case it explicitly searches for missing or empty values.
       |
-      |  search <category> <field> <value>
+      |  search <category> <field> [term]
       |
       |----------
       |* fields
