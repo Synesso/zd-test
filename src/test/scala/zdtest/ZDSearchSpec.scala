@@ -69,16 +69,8 @@ class ZDSearchSpec(implicit ee: ExecutionEnv) extends Specification with Arbitra
     }
 
     "process a user session when the repo can be loaded" >> {
-      val in = System.in
-      System.setSecurityManager(new NoExitSecurityManager)
-      try {
-        val loop = Future(ZDSearch.main(Array("src/test/resources")))
-        System.setIn(new ByteArrayInputStream(s"quit${System.lineSeparator()}".getBytes))
-        loop must throwAn[ExitException](ExitException(0)).awaitFor(1.minute)
-      } finally {
-        System.setSecurityManager(null)
-        System.setIn(in)
-      }
+      val loop = ZDSearch.userLoop(new UserInput("q").read, Array("src/test/resources"))
+      loop must not(throwAn[Exception]).await
     }
   }
 

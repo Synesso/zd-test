@@ -10,38 +10,37 @@ import zdtest.repo.Repository
 import zdtest.search.Index
 
 import scala.annotation.tailrec
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 
 object ZDSearch {
 
+
   def main(args: Array[String]): Unit = {
-
-    val userLoop = (for {
-      repo <- Repository.fromDir(new File(args.headOption.getOrElse(".")))
-      index <- repo.index
-    } yield (repo, index)).map { case (repo: Repository, index: Index) =>
-      println(
-        s"""Welcome to Zendesk Search.
-           |Indexed ${repo.users.size} users, ${repo.organisations.size} organizations and ${repo.tickets.size} tickets.
-           |
-           |Looking for user input: 'search ...', 'fields', 'help' or 'quit'.
-         """.stripMargin)
-      promptLoop(scala.io.StdIn.readLine(), repo, index)
-    }
-
-    val resultCode = userLoop.map(_ => 0).recover { case t =>
+    val resultCode = userLoop(scala.io.StdIn.readLine, args).map(_ => 0).recover { case t =>
       System.err.println(s"Unable to initialise: ${t.getMessage}")
       System.err.println(usageMessage)
       -1
     }
-
     System.exit(Await.result(resultCode, Duration.Inf))
   }
 
-  def promptLoop(readUserLine: => String, repo: Repository, index: Index,
-                 act: String => Unit = println, prompt: String => Unit = print): Unit = {
+  private[zdtest] def userLoop(input: => String, args: Array[String]): Future[Unit] = (for {
+    repo <- Repository.fromDir(new File(args.headOption.getOrElse(".")))
+    index <- repo.index
+  } yield (repo, index)).map { case (repo: Repository, index: Index) =>
+    println(
+      s"""Welcome to Zendesk Search.
+         |Indexed ${repo.users.size} users, ${repo.organisations.size} organizations and ${repo.tickets.size} tickets.
+         |
+           |Looking for user input: 'search ...', 'fields', 'help' or 'quit'.
+         """.stripMargin)
+    promptLoop(input, repo, index)
+  }
+
+  private[zdtest] def promptLoop(readUserLine: => String, repo: Repository, index: Index,
+                                 act: String => Unit = println, prompt: String => Unit = print): Unit = {
     @tailrec
     def loop(): Unit = {
       prompt("> ")
@@ -58,30 +57,31 @@ object ZDSearch {
           loop()
       }
     }
+
     loop()
   }
 
   val helpMessage: String = {
-      """Choose from the following commands:
-        |
-        |* search
-        |Prints elements from the given category where the field partially or fully matches the value. The
-        |Category must be one of {'user', 'ticket', 'organisation'}.
-        |
-        |  search <category> <field> <value>
-        |
-        |----------
-        |* fields
-        |Prints the set of available fields per category.
-        |
-        |----------
-        |* quit
-        |Exits the interactive user loop.
-        |
-        |----------
-        |* help
-        |Prints this message.
-      """.stripMargin
+    """Choose from the following commands:
+      |
+      |* search
+      |Prints elements from the given category where the field partially or fully matches the value. The
+      |Category must be one of {'user', 'ticket', 'organisation'}.
+      |
+      |  search <category> <field> <value>
+      |
+      |----------
+      |* fields
+      |Prints the set of available fields per category.
+      |
+      |----------
+      |* quit
+      |Exits the interactive user loop.
+      |
+      |----------
+      |* help
+      |Prints this message.
+    """.stripMargin
   }
 
   val fieldsMessage: String = {
