@@ -10,6 +10,9 @@ import scala.concurrent.duration._
 
 class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryInput {
 
+  // Because building multiple Indexes concurrently can exhaust memory on Travis.
+  sequential
+
   "building an index" should {
     "be successful when empty" >> {
       val index = Await.result(Index.build(), 5.seconds)
