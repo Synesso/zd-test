@@ -21,7 +21,7 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
 
     "allow multiple entries on the same key" >> {
       val orgA = genOrg.sample.get
-      val orgB=orgA.copy(_id = orgA._id + 1)
+      val orgB = orgA.copy(_id = orgA._id + 1)
       val index = Await.result(Index.build(organisations = Seq(orgA, orgB)), 5.seconds)
       index.search(OrgCat, "name", orgA.name) must containTheSameElementsAs(Seq(orgA, orgB))
     }
@@ -31,8 +31,8 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
       val index = Await.result(Index.build(organisations = orgs), 5.seconds)
       val variants = for {
         org <- orgs
-        (key, value) <- OrgCat.fields.mapValues(_(org))
-        prefix = value.take(2)
+        (key, value) <- OrgCat.fields.mapValues(_ (org))
+        prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c))
       } yield (org, key, value, prefix)
       forall(variants) { case (org, key, value, prefix) =>
         val i = index.search(OrgCat, key, prefix)
