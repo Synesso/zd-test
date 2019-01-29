@@ -1,5 +1,7 @@
 package zdtest.search
 
+import java.time.OffsetDateTime
+
 import org.scalacheck.Gen
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
@@ -12,8 +14,8 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
 
   sequential
 
-  "building an index" should {
-    "be successful when empty" >> {
+  "an index" should {
+    "be allowed to be empty" >> {
       val index = Await.result(Index.build(), 5.seconds)
       index.search(UserCat, "_id", "1") mustEqual Nil
     }
@@ -66,6 +68,27 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
         i must contain[Searchable](org).unless(value == "")
       }
     }
+
+    "allow searching for empty string on all fields on orgs" >> {
+      val org = Organisation(1, created_at = OffsetDateTime.MIN)
+      val index = Await.result(Index.build(organisations = Seq(org)), 5.seconds)
+      val keys = OrgCat.fields.mapValues(_(org)).filter(_._2 == "").keys // only fields where the value is an empty string
+      forall(keys) { k: String => index.search(OrgCat, k, "") mustEqual Seq(org) }
+    }.pendingUntilFixed
+
+    "allow searching for empty string on all fields on users" >> {
+      val user = User(1, created_at = OffsetDateTime.MIN, last_login_at = OffsetDateTime.MIN)
+      val index = Await.result(Index.build(users = Seq(user)), 5.seconds)
+      val keys = UserCat.fields.mapValues(_(user)).filter(_._2 == "").keys // only fields where the value is an empty string
+      forall(keys) { k: String => index.search(UserCat, k, "") mustEqual Seq(user) }
+    }.pendingUntilFixed
+
+    "allow searching for empty string on all fields on tickets" >> {
+      val ticket = Ticket("", created_at = OffsetDateTime.MIN)
+      val index = Await.result(Index.build(tickets = Seq(ticket)), 5.seconds)
+      val keys = TicketCat.fields.mapValues(_(ticket)).filter(_._2 == "").keys // only fields where the value is an empty string
+      forall(keys) { k: String => index.search(TicketCat, k, "") mustEqual Seq(ticket) }
+    }.pendingUntilFixed
   }
 
 }

@@ -33,7 +33,6 @@ object Index {
 
     def trie[T](ts: Iterable[T], key: T => String): Future[Trie[String, Seq[T]]] = Future {
       val variants = ts.flatMap { t =>
-        // todo - test word based search
         @tailrec
         def dropWords(s: String, ws: Set[String] = Set.empty): Set[String] = {
           s.trim match {

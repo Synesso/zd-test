@@ -11,3 +11,4 @@ Todos:
 * need to be able to search for empty
 * need to print human-readable
 * need to print related objects (as per screenshots, maybe just a portion?)
+* note that partial words are supported
