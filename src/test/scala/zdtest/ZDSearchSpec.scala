@@ -56,6 +56,12 @@ class ZDSearchSpec(implicit ee: ExecutionEnv) extends Specification with Arbitra
       val (i, o) = (new UserInput(s, "quit"), new CommandOutput)
       Future(ZDSearch.promptLoop(i.read, repo, index, o.write, ignore)) must beEqualTo(()).await
     }.setGen(Gen.identifier)
+
+    "understand zero-text input" >> {
+      val (i, o) = (new UserInput("", "", "", "", "", "", "q"), new CommandOutput)
+      Future(ZDSearch.promptLoop(i.read, repo, index, o.write, ignore)) must beEqualTo(()).await
+      o.results must beEmpty
+    }
   }
 
   "main method" should {
