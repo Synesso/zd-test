@@ -106,10 +106,11 @@ object ZDSearch {
 
   val usageMessage: String = {
     """
-      |Usage: java -jar <assembly_jar> <data_dir>
+      |Usage: java -jar <assembly_jar> [data_dir]
       |
       |   assembly_jar - the result of running `sbt assembly`
       |   data_dir     - the directory containing the data files organizations.json, tickets.json & users.json
+      |                  if omitted, `.` is assumed.
       |
     """.stripMargin
   }
