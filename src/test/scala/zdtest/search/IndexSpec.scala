@@ -16,6 +16,13 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
       index.search(UserCat, "_id", "1") mustEqual Nil
     }
 
+    "allow multiple entries on the same key" >> {
+      val orgA = genOrg.sample.get
+      val orgB=orgA.copy(_id = orgA._id + 1)
+      val index = Await.result(Index.build(organisations = Seq(orgA, orgB)), 5.seconds)
+      index.search(OrgCat, "name", orgA.name) must containTheSameElementsAs(Seq(orgA, orgB))
+    }
+
     "allow searching on all fields on organisations" >> {
       val orgs = Gen.nonEmptyListOf(genOrg).sample.get
       val index = Await.result(Index.build(organisations = orgs), 5.seconds)
@@ -23,12 +30,12 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
         org <- orgs
         (key, value) <- OrgCat.fields.mapValues(_(org))
         prefix = value.take(2)
-      } yield (org, key, prefix)
-      forall(variants) { case (org, key, prefix) =>
-        println(key)
-        index.search(OrgCat, key, prefix) must contain[Searchable](org)
+      } yield (org, key, value, prefix)
+      forall(variants) { case (org, key, value, prefix) =>
+        val i = index.search(OrgCat, key, prefix)
+        i must contain[Searchable](org).unless(value == "")
       }
-    }.pendingUntilFixed
+    }
   }
 
 }

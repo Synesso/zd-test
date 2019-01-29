@@ -7,16 +7,16 @@ import zdtest.domain._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
 
-class Index(orgs: Map[String, Trie[String, Organisation]],
-            users: Map[String, Trie[String, User]],
-            tickets: Map[String, Trie[String, Ticket]]) {
+class Index(val orgs: Map[String, Trie[String, Seq[Organisation]]],
+            users: Map[String, Trie[String, Seq[User]]],
+            tickets: Map[String, Trie[String, Seq[Ticket]]]) {
 
 
   def search(cat: Category[_], field: String, term: String): Seq[Searchable] = {
     cat match {
-      case OrgCat => orgs.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values).distinct
-      case UserCat => users.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values).distinct
-      case TicketCat => tickets.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values).distinct
+      case OrgCat => orgs.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values).flatten.distinct
+      case UserCat => users.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values).flatten.distinct
+      case TicketCat => tickets.get(field).toSeq.flatMap(_.prefixMap(term).asScala.values).flatten.distinct
     }
   }
 }
@@ -27,12 +27,14 @@ object Index {
             users: Iterable[User] = Nil,
             tickets: Iterable[Ticket] = Nil)(implicit ec: ExecutionContext): Future[Index] = {
 
-    def trie[T](ts: Iterable[T], key: T => String): Future[Trie[String, T]] = Future {
+    def trie[T](ts: Iterable[T], key: T => String): Future[Trie[String, Seq[T]]] = Future {
       val variants = ts.flatMap { t =>
         val k = key(t)
         val ks = (0 until k.length).map(k.drop)
         ks.map(_ -> t)
-      }.toMap.asJava
+      }.foldLeft(Map.empty[String, Seq[T]]) { case (map, (k, v)) =>
+          map.updated(k, v +: map.getOrElse(k, Seq.empty[T]))
+      }.asJava
       new PatriciaTrie(variants)
     }
 
