@@ -5,6 +5,7 @@ lazy val root = (project in file("."))
     organization := "io.github.synesso",
     scalaVersion := "2.12.8",
     Defaults.itSettings,
+    test in assembly := {},
     fork := true,
     libraryDependencies ++= List(
       "com.lihaoyi" %% "upickle" % "0.7.1",

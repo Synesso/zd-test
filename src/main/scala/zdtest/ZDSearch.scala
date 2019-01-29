@@ -16,7 +16,6 @@ import scala.concurrent.duration.Duration
 
 object ZDSearch {
 
-
   def main(args: Array[String]): Unit = {
     val resultCode = userLoop(scala.io.StdIn.readLine, args).map(_ => 0).recover { case t =>
       System.err.println(s"Unable to initialise: ${t.getMessage}")
@@ -26,17 +25,21 @@ object ZDSearch {
     System.exit(Await.result(resultCode, Duration.Inf))
   }
 
-  private[zdtest] def userLoop(input: => String, args: Array[String]): Future[Unit] = (for {
-    repo <- Repository.fromDir(new File(args.headOption.getOrElse(".")))
-    index <- repo.index
-  } yield (repo, index)).map { case (repo: Repository, index: Index) =>
-    println(
-      s"""Welcome to Zendesk Search.
-         |Indexed ${repo.users.size} users, ${repo.organisations.size} organizations and ${repo.tickets.size} tickets.
-         |
+  private[zdtest] def userLoop(input: => String, args: Array[String]): Future[Unit] = {
+    val dir = new File(args.headOption.getOrElse("."))
+    println(s"Loading from ${dir.getAbsolutePath}")
+    (for {
+      repo <- Repository.fromDir(dir)
+      _ = println(s"Indexing ${repo.users.size} users, ${repo.organisations.size} organizations and ${repo.tickets.size} tickets.")
+      index <- repo.index
+    } yield (repo, index)).map { case (repo: Repository, index: Index) =>
+      println(
+        s"""Welcome to Zendesk Search.
+           |
            |Looking for user input: 'search ...', 'fields', 'help' or 'quit'.
          """.stripMargin)
-    promptLoop(input, repo, index)
+      promptLoop(input, repo, index)
+    }
   }
 
   private[zdtest] def promptLoop(readUserLine: => String, repo: Repository, index: Index,
