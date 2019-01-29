@@ -27,13 +27,13 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
       index.search(OrgCat, "name", orgA.name) must containTheSameElementsAs(Seq(orgA, orgB))
     }
 
-    "allow searching on all fields on organisations" >> {
+    "allow case-insensitive searching on all fields on organisations" >> {
       val xs = Gen.nonEmptyListOf(genOrg).sample.get
       val index = Await.result(Index.build(organisations = xs), 5.seconds)
       val variants = for {
         x <- xs
         (key, value) <- OrgCat.fields.mapValues(_ (x))
-        prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c))
+        prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c)).toUpperCase
       } yield (x, key, value, prefix)
       forall(variants) { case (org, key, value, prefix) =>
         val i = index.search(OrgCat, key, prefix)
@@ -41,13 +41,13 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
       }
     }
 
-    "allow searching on all fields on users" >> {
+    "allow case-insensitive searching on all fields on users" >> {
       val xs = Gen.nonEmptyListOf(genUser).sample.get
       val index = Await.result(Index.build(users = xs), 5.seconds)
       val variants = for {
         x <- xs
         (key, value) <- UserCat.fields.mapValues(_ (x))
-        prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c))
+        prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c)).toUpperCase
       } yield (x, key, value, prefix)
       forall(variants) { case (org, key, value, prefix) =>
         val i = index.search(UserCat, key, prefix)
@@ -55,13 +55,13 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
       }
     }
 
-    "allow searching on all fields on tickets" >> {
+    "allow case-insensitive searching on all fields on tickets" >> {
       val xs = Gen.nonEmptyListOf(genTicket).sample.get
       val index = Await.result(Index.build(tickets = xs), 5.seconds)
       val variants = for {
         x <- xs
         (key, value) <- TicketCat.fields.mapValues(_ (x))
-        prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c))
+        prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c)).toUpperCase
       } yield (x, key, value, prefix)
       forall(variants) { case (org, key, value, prefix) =>
         val i = index.search(TicketCat, key, prefix)

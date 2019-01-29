@@ -17,7 +17,7 @@ class Index(val orgs: Map[String, Trie[String, Seq[Organisation]]],
 
 
   def search(cat: Category[_], field: String, term: String): Seq[Searchable] = {
-    val key = Index.convertKey(term) // todo - test
+    val key = Index.convertKey(term)
     cat match {
       case OrgCat => orgs.get(field).toSeq.flatMap(_.prefixMap(key).asScala.values).flatten.distinct
       case UserCat => users.get(field).toSeq.flatMap(_.prefixMap(key).asScala.values).flatten.distinct
