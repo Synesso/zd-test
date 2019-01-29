@@ -10,7 +10,6 @@ import scala.concurrent.duration._
 
 class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryInput {
 
-  // Because building multiple Indexes concurrently can exhaust memory on Travis.
   sequential
 
   "building an index" should {
@@ -27,15 +26,43 @@ class IndexSpec(implicit ee: ExecutionEnv) extends Specification with ArbitraryI
     }
 
     "allow searching on all fields on organisations" >> {
-      val orgs = Gen.nonEmptyListOf(genOrg).sample.get
-      val index = Await.result(Index.build(organisations = orgs), 5.seconds)
+      val xs = Gen.nonEmptyListOf(genOrg).sample.get
+      val index = Await.result(Index.build(organisations = xs), 5.seconds)
       val variants = for {
-        org <- orgs
-        (key, value) <- OrgCat.fields.mapValues(_ (org))
+        x <- xs
+        (key, value) <- OrgCat.fields.mapValues(_ (x))
         prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c))
-      } yield (org, key, value, prefix)
+      } yield (x, key, value, prefix)
       forall(variants) { case (org, key, value, prefix) =>
         val i = index.search(OrgCat, key, prefix)
+        i must contain[Searchable](org).unless(value == "")
+      }
+    }
+
+    "allow searching on all fields on users" >> {
+      val xs = Gen.nonEmptyListOf(genUser).sample.get
+      val index = Await.result(Index.build(users = xs), 5.seconds)
+      val variants = for {
+        x <- xs
+        (key, value) <- UserCat.fields.mapValues(_ (x))
+        prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c))
+      } yield (x, key, value, prefix)
+      forall(variants) { case (org, key, value, prefix) =>
+        val i = index.search(UserCat, key, prefix)
+        i must contain[Searchable](org).unless(value == "")
+      }
+    }
+
+    "allow searching on all fields on tickets" >> {
+      val xs = Gen.nonEmptyListOf(genTicket).sample.get
+      val index = Await.result(Index.build(tickets = xs), 5.seconds)
+      val variants = for {
+        x <- xs
+        (key, value) <- TicketCat.fields.mapValues(_ (x))
+        prefix = value.take(2).takeWhile(c => !Character.isWhitespace(c))
+      } yield (x, key, value, prefix)
+      forall(variants) { case (org, key, value, prefix) =>
+        val i = index.search(TicketCat, key, prefix)
         i must contain[Searchable](org).unless(value == "")
       }
     }
