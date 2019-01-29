@@ -4,6 +4,7 @@ import java.util.Locale
 
 import org.apache.commons.collections4.Trie
 import org.apache.commons.collections4.trie.PatriciaTrie
+import upickle.implicits.key
 import zdtest.domain._
 
 import scala.annotation.tailrec
@@ -16,16 +17,23 @@ class Index(val orgs: Map[String, Trie[String, Seq[Organisation]]],
 
 
   def search(cat: Category[_], field: String, term: String): Seq[Searchable] = {
-    val lowercaseTerm = term.toLowerCase(Locale.ROOT) // todo - test
+    val key = Index.convertKey(term) // todo - test
     cat match {
-      case OrgCat => orgs.get(field).toSeq.flatMap(_.prefixMap(lowercaseTerm).asScala.values).flatten.distinct
-      case UserCat => users.get(field).toSeq.flatMap(_.prefixMap(lowercaseTerm).asScala.values).flatten.distinct
-      case TicketCat => tickets.get(field).toSeq.flatMap(_.prefixMap(lowercaseTerm).asScala.values).flatten.distinct
+      case OrgCat => orgs.get(field).toSeq.flatMap(_.prefixMap(key).asScala.values).flatten.distinct
+      case UserCat => users.get(field).toSeq.flatMap(_.prefixMap(key).asScala.values).flatten.distinct
+      case TicketCat => tickets.get(field).toSeq.flatMap(_.prefixMap(key).asScala.values).flatten.distinct
     }
   }
 }
 
 object Index {
+
+  val EndOfText = "\u0003"
+
+  def convertKey(key: String): String = key match {
+    case "" => EndOfText
+    case k => k.toLowerCase(Locale.ROOT)
+  }
 
   def build(organisations: Iterable[Organisation] = Nil,
             users: Iterable[User] = Nil,
@@ -42,7 +50,10 @@ object Index {
               dropWords(tail, ws + word)
           }
         }
-        dropWords(key(t).toLowerCase(Locale.ROOT)).map(_ -> t)
+        convertKey(key(t)) match {
+          case EndOfText => Set(EndOfText -> t) // special handling for empty values
+          case k => dropWords(k).map(_ -> t) // create a separate entry for each trailing sub-sequence of words
+        }
       }.foldLeft(Map.empty[String, Seq[T]]) { case (map, (k, v)) =>
           map.updated(k, v +: map.getOrElse(k, Seq.empty[T]))
       }.asJava
