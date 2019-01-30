@@ -146,7 +146,6 @@ Prints this help info within the console.
 
 Search terms will match on whole words and prefixes, but not on subsequences. 
 e.g. `Mary` will be found with `Mary` & `Mar`, but not `ary`.
-This is due to space & time requirements for building a trie that caters for subsequence matches.
 
 ### Loose data coupling
 
