@@ -74,6 +74,65 @@ related tickets: ticket 189eed9f-b44c-49f3-a904-2c482193996a - "A Catastrophe in
 
 Prints the set of available fields per category.
 
+```
+> fields
+
+Search User with one of
+===========================
+* _id
+* active
+* alias
+* created_at
+* email
+* external_id
+* last_login_at
+* locale
+* name
+* organization_id
+* phone
+* role
+* shared
+* signature
+* suspended
+* tags
+* timezone
+* url
+* verified
+
+
+Search Organisation with one of
+===========================
+* _id
+* created_at
+* details
+* domain_names
+* external_id
+* name
+* shared_tickets
+* tags
+* url
+
+
+Search Ticket with one of
+===========================
+* _id
+* assignee_id
+* created_at
+* description
+* due_at
+* external_id
+* has_incidents
+* organization_id
+* priority
+* status
+* subject
+* submitter_id
+* tags
+* type
+* url
+* via
+```
+
 ### Quit (q)
 
 Exits the interactive user loop.
