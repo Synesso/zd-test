@@ -54,13 +54,18 @@ object ZDSearch {
             case Some(NoOp) =>
             case Some(Help) => act(helpMessage)
             case Some(Fields) => act(fieldsMessage)
-            case Some(Search(OrgCat, field, term)) => index.searchOrgs(field, term).map(_.fullDescription(repo, index)).foreach(act)
-            case Some(Search(UserCat, field, term)) => index.searchUsers(field, term).map(_.fullDescription(repo, index)).foreach(act)
-            case Some(Search(TicketCat, field, term)) => index.searchTickets(field, term).map(_.fullDescription(repo, index)).foreach(act)
+            case Some(Search(OrgCat, field, term)) => actOnResults(index.searchOrgs(field, term).map(_.fullDescription(repo, index)))
+            case Some(Search(UserCat, field, term)) => actOnResults(index.searchUsers(field, term).map(_.fullDescription(repo, index)))
+            case Some(Search(TicketCat, field, term)) => actOnResults(index.searchTickets(field, term).map(_.fullDescription(repo, index)))
             case _ => act("command not recognised")
           }
           loop()
       }
+    }
+
+    def actOnResults(rs: Seq[String]): Unit = {
+      act(s"${rs.size} result${if (rs.size == 1) "" else "s"}" + System.lineSeparator())
+      rs.foreach(act)
     }
 
     loop()

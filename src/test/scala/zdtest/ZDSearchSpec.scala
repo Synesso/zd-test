@@ -50,7 +50,7 @@ class ZDSearchSpec(implicit ee: ExecutionEnv) extends Specification with Arbitra
     "allow search command for orgs" >> {
       val (i, o) = (new UserInput(s"search org _id ${testRepo.organisations.keys.head}", "q"), new CommandOutput)
       Future(ZDSearch.promptLoop(i.read, testRepo, index, o.write, ignore)) must beEqualTo(()).await
-      o.results must not(beEmpty)
+      o.results must contain("1 result")
     }
 
     "allow search command for tickets" >> {
