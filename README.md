@@ -33,12 +33,42 @@ To run from the project root with the supplied test data:
 ### Search
 
 Prints elements from the given category where the field partially or fully matches the given term.
-* Category must be one of `{'user', 'ticket', 'organisation'}`.
-* Field must be a valid field for the category (see `fields`).
-* Term is a _case-insensitive_ match on the _prefix_ of any word in value of the field.
-   Term may be omitted, in which case it explicitly searches for missing or empty values.
 
 `search <category> <field> [term]`
+
+* Category must be one of `{'user', 'ticket', 'organisation'}`.
+* Field must be a valid field for the category (see `fields`).
+* Term is a _case-insensitive_ match on the _prefix_ of any word in value of the field. Term may be omitted, in which
+  case it explicitly searches for missing or empty values.
+
+Example:
+```
+> search user name del
+1 result
+_id:             57
+created_at:      2016-06-10T01:38:38 -10:00
+last_login_at:   2014-04-21T08:53:02 -10:00
+url:             http://initech.zendesk.com/api/v2/users/57.json
+external_id:     cc91aaa0-49af-42aa-9a85-0278fee1a96c
+name:            Mari Deleon
+alias:           Mr Caitlin
+active:          true
+verified:        true
+shared:          false
+locale:          zh-CN
+timezone:        Guatemala
+email:           caitlindeleon@flotonic.com
+phone:           8645-272-680
+signature:       Don't Worry Be Happy!
+organization:    Noralex - #113
+tags:            Blodgett, Nicut, Smock, Finzel
+suspended:       false
+role:            admin
+related tickets: ticket 189eed9f-b44c-49f3-a904-2c482193996a - "A Catastrophe in Singapore"
+                 ticket 62a4326f-7114-499f-9adc-a14e99a7ffb4 - "A Drama in Wallis and Futuna Islands"
+                 ticket 710bf26b-d65b-4712-95aa-4d123c06e0d7 - "A Nuisance in Costa Rica"
+                 ticket 9216c7b3-9a7b-40cb-8f96-56fca79520eb - "A Problem in Marshall Islands"
+```
 
 ### Fields
 
