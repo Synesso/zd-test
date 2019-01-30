@@ -70,7 +70,7 @@ related tickets: ticket 189eed9f-b44c-49f3-a904-2c482193996a - "A Catastrophe in
                  ticket 9216c7b3-9a7b-40cb-8f96-56fca79520eb - "A Problem in Marshall Islands"
 ```
 
-### Fields
+### Fields (f)
 
 Prints the set of available fields per category.
 
