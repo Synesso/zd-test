@@ -1,11 +1,15 @@
 package zdtest.domain
 
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 import upickle.default._
+import zdtest.repo.Repository
+import zdtest.search.Index
 
-trait Searchable
+trait Searchable {
+  def fullDescription(repo: Repository, index: Index): String
+  def shortDescription: String
+}
 
 trait CommonRW {
   implicit val dateTimeRW: ReadWriter[OffsetDateTime] = {

@@ -5,7 +5,7 @@ import java.util.Locale
 
 import zdtest.cli.Command
 import zdtest.cli.Command._
-import zdtest.domain.Category
+import zdtest.domain.{Category, OrgCat, TicketCat, UserCat}
 import zdtest.repo.Repository
 import zdtest.search.Index
 
@@ -17,7 +17,7 @@ import scala.concurrent.duration.Duration
 object ZDSearch {
 
   def main(args: Array[String]): Unit = {
-    val resultCode = userLoop(scala.io.StdIn.readLine, args).map(_ => 0).recover { case t =>
+    val resultCode = startApp(input = scala.io.StdIn.readLine, args).map(_ => 0).recover { case t =>
       System.err.println(s"Unable to initialise: ${t.getMessage}")
       System.err.println(usageMessage)
       -1
@@ -25,7 +25,7 @@ object ZDSearch {
     System.exit(Await.result(resultCode, Duration.Inf))
   }
 
-  private[zdtest] def userLoop(input: => String, args: Array[String]): Future[Unit] = {
+  private[zdtest] def startApp(input: => String, args: Array[String]): Future[Unit] = {
     val dir = new File(args.headOption.getOrElse("."))
     println(s"Loading from ${dir.getAbsolutePath}")
     (for {
@@ -54,7 +54,9 @@ object ZDSearch {
             case Some(NoOp) =>
             case Some(Help) => act(helpMessage)
             case Some(Fields) => act(fieldsMessage)
-            case Some(Search(cat, field, term)) => index.search(cat, field, term).map(repo.asString).foreach(act)
+            case Some(Search(OrgCat, field, term)) => index.searchOrgs(field, term).map(_.fullDescription(repo, index)).foreach(act)
+            case Some(Search(UserCat, field, term)) => index.searchUsers(field, term).map(_.fullDescription(repo, index)).foreach(act)
+            case Some(Search(TicketCat, field, term)) => index.searchTickets(field, term).map(_.fullDescription(repo, index)).foreach(act)
             case _ => act("command not recognised")
           }
           loop()

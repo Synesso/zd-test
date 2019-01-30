@@ -15,8 +15,6 @@ class Repository(val organisations: Map[Long, Organisation] = Map.empty,
   private lazy val _index: Future[Index] = Index.build(organisations.values, users.values, tickets.values)
 
   def index: Future[Index] = _index
-
-  def asString(s: Searchable): String = s.toString
 }
 
 object Repository {

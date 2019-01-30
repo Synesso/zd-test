@@ -4,26 +4,25 @@ import java.util.Locale
 
 import org.apache.commons.collections4.Trie
 import org.apache.commons.collections4.trie.PatriciaTrie
-import upickle.implicits.key
 import zdtest.domain._
 
 import scala.annotation.tailrec
-import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
+import scala.concurrent.{ExecutionContext, Future}
 
-class Index(val orgs: Map[String, Trie[String, Seq[Organisation]]],
+class Index(orgs: Map[String, Trie[String, Seq[Organisation]]],
             users: Map[String, Trie[String, Seq[User]]],
             tickets: Map[String, Trie[String, Seq[Ticket]]]) {
 
+  def searchOrgs(field: String, term: String): Seq[Organisation] =
+    orgs.get(field).toSeq.flatMap(_.prefixMap(Index.convertKey(term)).asScala.values).flatten.distinct
 
-  def search(cat: Category[_], field: String, term: String): Seq[Searchable] = {
-    val key = Index.convertKey(term)
-    cat match {
-      case OrgCat => orgs.get(field).toSeq.flatMap(_.prefixMap(key).asScala.values).flatten.distinct
-      case UserCat => users.get(field).toSeq.flatMap(_.prefixMap(key).asScala.values).flatten.distinct
-      case TicketCat => tickets.get(field).toSeq.flatMap(_.prefixMap(key).asScala.values).flatten.distinct
-    }
-  }
+  def searchTickets(field: String, term: String): Seq[Ticket] =
+    tickets.get(field).toSeq.flatMap(_.prefixMap(Index.convertKey(term)).asScala.values).flatten.distinct
+
+  def searchUsers(field: String, term: String): Seq[User] =
+    users.get(field).toSeq.flatMap(_.prefixMap(Index.convertKey(term)).asScala.values).flatten.distinct
+
 }
 
 object Index {

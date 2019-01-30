@@ -4,6 +4,7 @@ import java.io.File
 
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.mutable.Specification
+import zdtest.TestRepository
 import zdtest.domain.{ArbitraryInput, Organisation, Ticket, User}
 
 import scala.concurrent.duration._
@@ -43,14 +44,14 @@ class RepositorySpec(implicit ee: ExecutionEnv) extends Specification with Arbit
 
   "instantiating a repository from files" should {
     "build correctly with sample data" >> {
-      Repository.fromDir(new File("src/test/resources")) must beLike[Repository] { case repo =>
+      TestRepository.repo must beLike[Repository] { case repo =>
         repo.organisations.values must
           containTheSameElementsAs(Parser.parseOrgs(new File("src/test/resources/organizations.json")))
         repo.users.values must
           containTheSameElementsAs(Parser.parseUsers(new File("src/test/resources/users.json")))
         repo.tickets.values must
           containTheSameElementsAs(Parser.parseTickets(new File("src/test/resources/tickets.json")))
-      }.awaitFor(5.seconds)
+      }
     }
 
     "fail if the dir is invalid" >> {
