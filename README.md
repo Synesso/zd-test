@@ -38,8 +38,8 @@ Prints elements from the given category where the field partially or fully match
 
 * Category must be one of `{'user', 'ticket', 'organisation'}`.
 * Field must be a valid field for the category (see `fields`).
-* Term is a _case-insensitive_ match on the _prefix_ of any word in value of the field. Term may be omitted, in which
-  case it explicitly searches for missing or empty values.
+* Term is a _case-insensitive_ match on the _prefix_ of _any_ word in value of the field. e.g. `"au" will match "Baked Aubergine".
+  Term may be omitted, in which case it explicitly searches for missing or empty values.
 
 Example:
 ```
