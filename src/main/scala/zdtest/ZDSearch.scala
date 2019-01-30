@@ -36,7 +36,11 @@ object ZDSearch {
       println(
         s"""Welcome to Zendesk Search.
            |
-           |Looking for user input: 'search ...', 'fields', 'help' or 'quit'.
+           |Enter command:
+           | * search <category={user|org|ticket}> <field> [term]
+           | * fields (f)
+           | * help (h)
+           | * quit (q)
          """.stripMargin)
       promptLoop(input, repo, index)
     }
@@ -77,12 +81,15 @@ object ZDSearch {
       |
       |* search
       |Prints elements from the given category where the field partially or fully matches the given term.
-      |Category must be one of {'user', 'ticket', 'organisation'}.
-      |Field must be a valid field for the category (see `fields`).
-      |Term is a case-insensitive match on the prefix of any word in value of the field.
-      |   Term may be omitted, in which case it explicitly searches for missing or empty values.
       |
       |  search <category> <field> [term]
+      |
+      |Category must be one of {'user', 'ticket', ('org' | 'organisation' | 'organization')}.
+      |Field must be a valid field for the category (see `fields`).
+      |Term is a case-insensitive match on the prefix of any word in value of the field. It may be omitted, in which
+      |   case it explicitly searches for missing or empty values.
+      |
+      |e.g. search org _id 101
       |
       |----------
       |* fields

@@ -20,7 +20,7 @@ object Command {
 
       case Seq("help") | Seq("h") => Some(Help)
 
-      case Seq("fields") => Some(Fields)
+      case Seq("fields") | Seq("f") => Some(Fields)
 
       case "search" +: cat +: field +: term =>
         Category.withName(cat).map(Search(_, field, term.mkString(" ")))

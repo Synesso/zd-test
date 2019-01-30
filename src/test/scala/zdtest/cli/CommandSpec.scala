@@ -1,6 +1,6 @@
 package zdtest.cli
 
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen
 import org.specs2.mutable.Specification
 import zdtest.cli.Command._
 import zdtest.domain.{ArbitraryInput, Category, UserCat}
@@ -30,6 +30,10 @@ class CommandSpec extends Specification with ArbitraryInput {
 
     "parse 'fields' to Fields" >> {
       Command("fields") must beSome[Command](Fields)
+    }
+
+    "parse 'f' to Fields" >> {
+      Command("f") must beSome[Command](Fields)
     }
 
     "parse 'search' with the correct quantity of parameters" >> prop { (cat: Category[_], field: String, term: String) =>
