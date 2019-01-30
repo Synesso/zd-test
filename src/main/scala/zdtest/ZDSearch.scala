@@ -64,7 +64,8 @@ object ZDSearch {
     }
 
     def actOnResults(rs: Seq[String]): Unit = {
-      act(s"${rs.size} result${if (rs.size == 1) "" else "s"}" + System.lineSeparator())
+      act(s"${rs.size} result${if (rs.size == 1) "" else "s"}")
+      act("")
       rs.foreach(act)
     }
 

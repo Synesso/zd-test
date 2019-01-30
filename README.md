@@ -2,6 +2,10 @@
 [![codecov](https://codecov.io/gh/Synesso/zd-test/branch/master/graph/badge.svg)](https://codecov.io/gh/Synesso/zd-test)
 
 
+# ZDSearch
+
+A 
+
 Transient notes: 
 
 * The app will not assert that the data is linked correctly, as the test data includes tickets which declare organisations that are not present.
